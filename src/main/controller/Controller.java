@@ -48,7 +48,7 @@ public class Controller {
     private CalligraphyPen calligraphyPen;
     private MarkerPen markerPen;
     private EllipseDrawer ellipseDrawer;
-    private IsoscelesTriangleDrawer isoscelesTriangle;
+    private IsoscelesTriangleDrawer isoscelesTriangleDrawer;
     private LineDrawer lineDrawer;
     private RoundedRectangleDrawer roundedRectangleDrawer;
     private SquareTriangleDrawer squareTriangleDrawer;
@@ -56,25 +56,28 @@ public class Controller {
     private ToolType currentTool;
 
     public Controller(View v, Model m) {
+        //<editor-fold defaultstate="collapsed" desc="Khởi tạo biến">
         model = m;
         view = v;
 
         pencil = new Pencil(view.getPaintPane());
-        currentTool = ToolType.PENCIL;
-
         eraser = new Eraser(view.getPaintPane());
-
         floodFiller = new FloodFiller(view.getPaintPane());
-
         rectangleDrawer = new RectangleDrawer(view.getPaintPane());
-        
         curveLineDrawer = new CurveLineDrawer(view.getPaintPane());
-        
         airbrush = new Airbrush(view.getPaintPane());
-        
         brush = new Brush(view.getPaintPane());
-        
         calligraphyPen = new CalligraphyPen(view.getPaintPane());
+        markerPen = new MarkerPen(view.getPaintPane());
+        ellipseDrawer = new EllipseDrawer(view.getPaintPane());
+        isoscelesTriangleDrawer = new IsoscelesTriangleDrawer(view.getPaintPane());
+        lineDrawer = new LineDrawer(view.getPaintPane());
+        roundedRectangleDrawer = new RoundedRectangleDrawer(view.getPaintPane());
+        squareTriangleDrawer = new SquareTriangleDrawer(view.getPaintPane());
+        //</editor-fold>
+        
+        // set default tool
+        currentTool = ToolType.PENCIL;
 
         exitMenuAction();
         saveAsMenuAction();
@@ -89,6 +92,7 @@ public class Controller {
         view.getPaintPane().addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
                 if (null != currentTool) {
                     switch (currentTool) {
                         case PENCIL:
@@ -114,16 +118,36 @@ public class Controller {
                             break;
                         case CALLIGRAPHY_PEN:
                             calligraphyPen.mousePressedHandling(event);
+                        case MARKER_PEN:
+                            markerPen.mousePressedHandling(event);
+                            break;
+                        case ELLIPSE:
+                            ellipseDrawer.mousePressedHandling(event);
+                            break;
+                        case ISOSCELES_TRIANGLE:
+                            isoscelesTriangleDrawer.mousePressedHandling(event);
+                            break;
+                        case LINE:
+                            lineDrawer.mousePressedHandling(event);
+                            break;
+                        case ROUNDED_RECTANGLE:
+                            roundedRectangleDrawer.mousePressedHandling(event);
+                            break;
+                        case SQUARE_TRIANGLE:
+                            squareTriangleDrawer.mousePressedHandling(event);
+                            break;
                         default:
                             break;
                     }
                 }
+                //</editor-fold>
             }
 
         });
         view.getPaintPane().addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
                 if (null != currentTool) {
                     switch (currentTool) {
                         case PENCIL:
@@ -147,16 +171,36 @@ public class Controller {
                         case CALLIGRAPHY_PEN:
                             calligraphyPen.mouseDraggedHandling(event);
                             break;
+                        case MARKER_PEN:
+                            markerPen.mouseDraggedHandling(event);
+                            break;
+                        case ELLIPSE:
+                            ellipseDrawer.mouseDraggedHandling(event);
+                            break;
+                        case ISOSCELES_TRIANGLE:
+                            isoscelesTriangleDrawer.mouseDraggedHandling(event);
+                            break;
+                        case LINE:
+                            lineDrawer.mouseDraggedHandling(event);
+                            break;
+                        case ROUNDED_RECTANGLE:
+                            roundedRectangleDrawer.mouseDraggedHandling(event);
+                            break;
+                        case SQUARE_TRIANGLE:
+                            squareTriangleDrawer.mouseDraggedHandling(event);
+                            break;
                         default:
                             break;
                     }
                 }
+                //</editor-fold>
             }
 
         });
         view.getPaintPane().addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
                 if (null != currentTool) {
                     switch (currentTool) {
                         case CURVE_LINE:
@@ -172,6 +216,7 @@ public class Controller {
                             break;
                     }
                 }
+                //</editor-fold>
             }
 
         });
@@ -188,6 +233,12 @@ public class Controller {
                 airbrush.setSizeOfPen(newValue.doubleValue());
                 brush.setSizeOfPen(newValue.doubleValue());
                 calligraphyPen.setSizeOfPen(newValue.doubleValue());
+                markerPen.setSizeOfPen(newValue.doubleValue());
+                ellipseDrawer.setSizeOfPen(newValue.doubleValue());
+                isoscelesTriangleDrawer.setSizeOfPen(newValue.doubleValue());
+                lineDrawer.setSizeOfPen(newValue.doubleValue());
+                roundedRectangleDrawer.setSizeOfPen(newValue.doubleValue());
+                squareTriangleDrawer.setSizeOfPen(newValue.doubleValue());
             }
         });
     }
@@ -203,6 +254,12 @@ public class Controller {
                 airbrush.setColor(view.getColorOfColorPicker());
                 brush.setColor(view.getColorOfColorPicker());
                 calligraphyPen.setColor(view.getColorOfColorPicker());
+                markerPen.setColor(view.getColorOfColorPicker());
+                ellipseDrawer.setColor(view.getColorOfColorPicker());
+                isoscelesTriangleDrawer.setColor(view.getColorOfColorPicker());
+                lineDrawer.setColor(view.getColorOfColorPicker());
+                roundedRectangleDrawer.setColor(view.getColorOfColorPicker());
+                squareTriangleDrawer.setColor(view.getColorOfColorPicker());
             }
         });
     }
@@ -211,7 +268,9 @@ public class Controller {
         view.toggleBtnGroupAction(new ChangeListener<Toggle>() {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if(newValue.getUserData() != ToolType.CURVE_LINE) curveLineDrawer.resetPressCount();
+                if (newValue.getUserData() != ToolType.CURVE_LINE) {
+                    curveLineDrawer.resetPressCount();
+                }
                 switch ((ToolType) newValue.getUserData()) {
                     case PENCIL:
                         currentTool = ToolType.PENCIL;
@@ -236,6 +295,24 @@ public class Controller {
                         break;
                     case CALLIGRAPHY_PEN:
                         currentTool = ToolType.CALLIGRAPHY_PEN;
+                        break;
+                    case MARKER_PEN:
+                        currentTool = ToolType.MARKER_PEN;
+                        break;
+                    case ELLIPSE:
+                        currentTool = ToolType.ELLIPSE;
+                        break;
+                    case ISOSCELES_TRIANGLE:
+                        currentTool = ToolType.ISOSCELES_TRIANGLE;
+                        break;
+                    case LINE:
+                        currentTool = ToolType.LINE;
+                        break;
+                    case ROUNDED_RECTANGLE:
+                        currentTool = ToolType.ROUNDED_RECTANGLE;
+                        break;
+                    case SQUARE_TRIANGLE:
+                        currentTool = ToolType.SQUARE_TRIANGLE;
                         break;
                     default:
                         break;

@@ -27,9 +27,9 @@ public class CurveLineDrawer extends PaintTool {
 
     private BooleanProperty isPressed;
 
-    public CurveLineDrawer(Pane panee) {
+    public CurveLineDrawer(Pane pane) {
 
-        pane = panee;
+        this.pane = pane;
 
         pressCount = 0;
 
@@ -38,7 +38,6 @@ public class CurveLineDrawer extends PaintTool {
         isPressed.addListener(new ChangeListener<Boolean>() { // nếu là IntegerProperty thì phải tách ChangeListener ra thành 1 biến
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                System.out.println(pressCount);
                 if (newValue == true && oldValue == false) {
                     if (pressCount >= 0 && pressCount < 3) {
                         pressCount++;

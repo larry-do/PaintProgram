@@ -19,7 +19,7 @@ public abstract class PaintTool {
     
     public enum ToolType {AIRBRUSH, BRUSH, CALLIGRAPHY_PEN, MARKER_PEN
                         , PENCIL, CURVE_LINE, ELLIPSE, ISOSCELES_TRIANGLE
-                        , LINE, RECTANGLE, ROUND_RECTANGLE, SQUARE_TRIANGLE
+                        , LINE, RECTANGLE, ROUNDED_RECTANGLE, SQUARE_TRIANGLE
                         , ERASER, FLOOD_FILLER, TEXT, NULL};
 
     protected Color color = Color.BLACK;
