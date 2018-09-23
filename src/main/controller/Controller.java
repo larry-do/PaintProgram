@@ -19,9 +19,12 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Toggle;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import main.model.Model;
 import main.view.View;
 
@@ -34,9 +37,10 @@ public class Controller {
     private Model model;
     private View view;
 
-    private BooleanProperty ctrlPressed = new SimpleBooleanProperty(false);
-    private BooleanProperty keySPressed = new SimpleBooleanProperty(false);
-    private BooleanBinding combineKey = ctrlPressed.and(keySPressed);
+    private BooleanProperty ctrlPressed;
+    private BooleanProperty keySPressed;
+    private BooleanBinding combineKey;
+    private BooleanProperty isWheelScroll;
 
     private Pencil pencil;
     private Eraser eraser;
@@ -60,6 +64,11 @@ public class Controller {
         model = m;
         view = v;
 
+        ctrlPressed = new SimpleBooleanProperty(false);
+        keySPressed = new SimpleBooleanProperty(false);
+        combineKey = ctrlPressed.and(keySPressed);
+        isWheelScroll = new SimpleBooleanProperty(false);
+
         pencil = new Pencil(view.getPaintPane());
         eraser = new Eraser(view.getPaintPane());
         floodFiller = new FloodFiller(view.getPaintPane());
@@ -75,20 +84,23 @@ public class Controller {
         roundedRectangleDrawer = new RoundedRectangleDrawer(view.getPaintPane());
         squareTriangleDrawer = new SquareTriangleDrawer(view.getPaintPane());
         //</editor-fold>
-        
+
         // set default tool
         currentTool = ToolType.PENCIL;
 
+        mouseActionHandler();
+        keyboardActionHandler();
+        openImageFromOutside();
         exitMenuAction();
         saveAsMenuAction();
         saveWithKeyBoard();
         toggleBtnGroupAction();
         colorPickerAction();
         sizeOfPenSliderAction();
-        paintPaneActionHandler();
+        zoomActionHandler();
     }
 
-    private void paintPaneActionHandler() {
+    private void mouseActionHandler() {
         view.getPaintPane().addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -222,6 +234,31 @@ public class Controller {
         });
     }
 
+    private void keyboardActionHandler() {
+        view.setSceneEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.CONTROL) {
+                    ctrlPressed.set(true);
+                } else if (event.getCode() == KeyCode.S) {
+                    keySPressed.set(true);
+                }
+            }
+
+        });
+        view.setSceneEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.CONTROL) {
+                    ctrlPressed.set(false);
+                } else if (event.getCode() == KeyCode.S) {
+                    keySPressed.set(false);
+                }
+            }
+
+        });
+    }
+
     private void sizeOfPenSliderAction() {
         view.sizeOfPenSliderAction(new ChangeListener<Number>() {
             @Override
@@ -324,38 +361,15 @@ public class Controller {
     }
 
     private void saveWithKeyBoard() {
-
         combineKey.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                model.writeImage(view.getRenderedImage());
-            }
-        });
-        view.getScene().addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                System.out.println(event.getCode());
-                if (event.getCode() == KeyCode.CONTROL) {
-                    ctrlPressed.set(true);
-                }
-                if (event.getCode() == KeyCode.S) {
-                    keySPressed.set(true);
-                }
-            }
-
-        });
-        view.getScene().addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                System.out.println(event.getCode());
-                if (event.getCode() == KeyCode.CONTROL) {
+                if (newValue) {
                     ctrlPressed.set(false);
-                }
-                if (event.getCode() == KeyCode.S) {
                     keySPressed.set(false);
+                    model.writeImage(view.getRenderedImage());
                 }
             }
-
         });
     }
 
@@ -363,6 +377,9 @@ public class Controller {
         view.exitMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                if (view.getPaintPane().getChildren().size() > 0) {
+                    // hỏi người dùng xem có muốn save không?
+                }
                 Platform.exit();
                 System.exit(0);
             }
@@ -378,4 +395,40 @@ public class Controller {
         });
     }
 
+    private void openImageFromOutside() {
+        view.openImageFromOutside(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Image img = model.getImage();
+                if (img != null) {
+                    ImageView imgView = new ImageView(img);
+                    if (view.getPaintPane().getChildren().size() > 0) {
+                        // hỏi người dùng xem có muốn save không?
+                    }
+                    view.getPaintPane().setMinSize(img.getWidth(), img.getHeight());
+                    view.getPaintPane().setMaxSize(img.getWidth(), img.getHeight());
+                    view.getPaintPane().getChildren().add(imgView);
+                }
+            }
+        });
+    }
+
+    private void zoomActionHandler() {
+        view.setScrollPaneEventHandler(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if (ctrlPressed.getValue()) {
+                    double zoomFactor = 1.05;
+                    double deltaY = event.getDeltaY();
+                    if (deltaY < 0) {
+                        zoomFactor = 2.0 - zoomFactor;
+                    }
+                    view.getPaintPane().setScaleX(view.getPaintPane().getScaleY() * zoomFactor);
+                    view.getPaintPane().setScaleY(view.getPaintPane().getScaleY() * zoomFactor);
+                    event.consume(); // chặn cho scroll bar ko được chạy
+                }
+                
+            }
+        });
+    }
 }

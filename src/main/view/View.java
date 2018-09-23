@@ -10,6 +10,7 @@ import java.awt.image.RenderedImage;
 import javafx.beans.value.ChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Scene;
@@ -33,6 +34,7 @@ public class View {
     private Pane backgroundPane;
 
     private Pane paintPane;
+    private ScrollPane paintScrollPane;
     private Pane toolPane;
 
     private MenuBar menuBar;
@@ -79,13 +81,23 @@ public class View {
         // tạo vùng vẽ
         //<editor-fold defaultstate="collapse" desc="Paint Pane">
         paintPane = new Pane();
-        paintPane.setMinSize(1050 + 10, 695 + 10);
-        paintPane.setMaxSize(1050 + 10, 695 + 10);
         paintPane.setStyle("-fx-background-color: white");
-        paintPane.setLayoutX(150);
-        paintPane.setLayoutY(25);
+        paintPane.setMinSize(1050, 695);
+        paintPane.setMaxSize(1050, 695);
 
-        backgroundPane.getChildren().add(paintPane);
+        paintScrollPane = new ScrollPane();
+        paintScrollPane.setMinSize(1050 + 10, 695 + 10);
+        paintScrollPane.setMaxSize(1050 + 10, 695 + 10);
+        paintScrollPane.setLayoutX(150);
+        paintScrollPane.setLayoutY(25);
+        paintScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        paintScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        paintScrollPane.setFitToHeight(true);
+        paintScrollPane.setFitToWidth(true);
+        paintScrollPane.setPannable(false);
+        paintScrollPane.setContent(paintPane);
+
+        backgroundPane.getChildren().add(paintScrollPane);
         //</editor-fold>
         // tạo vùng chức năng 
         //<editor-fold defaultstate="collapse" desc="Tool Pane">
@@ -116,15 +128,15 @@ public class View {
         floodFillerBtn = new ToggleButton("floodFill");
         floodFillerBtn.setToggleGroup(toggleGroup);
         floodFillerBtn.setUserData(ToolType.FLOOD_FILLER);
-        
+
         rectangleDrawerBtn = new ToggleButton("rectangle");
         rectangleDrawerBtn.setToggleGroup(toggleGroup);
         rectangleDrawerBtn.setUserData(ToolType.RECTANGLE);
-        
+
         curveLineDrawerBtn = new ToggleButton("curveLine");
         curveLineDrawerBtn.setToggleGroup(toggleGroup);
         curveLineDrawerBtn.setUserData(ToolType.CURVE_LINE);
-        
+
         airbrushBtn = new ToggleButton("airbrush");
         airbrushBtn.setToggleGroup(toggleGroup);
         airbrushBtn.setUserData(ToolType.AIRBRUSH);
@@ -142,8 +154,16 @@ public class View {
         //</editor-fold>
     }
 
-    public void saveWithKeyboard(EventType<KeyEvent> eventType, EventHandler<KeyEvent> eventHandler) {
-        scene.addEventHandler(eventType, eventHandler);
+    public <T extends Event> void setScrollPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+        paintScrollPane.addEventFilter(eventType, eventHandler);
+    }
+
+    public void openImageFromOutside(EventHandler<ActionEvent> eventHandler) {
+        openMenuItem.setOnAction(eventHandler);
+    }
+
+    public <T extends Event> void setSceneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+        scene.addEventFilter(eventType, eventHandler);
     }
 
     public void exitMenuAction(EventHandler<ActionEvent> eventHandler) {
