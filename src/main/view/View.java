@@ -17,7 +17,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -34,7 +33,6 @@ public class View {
     private Pane backgroundPane;
 
     private Pane paintPane;
-    private ScrollPane paintScrollPane;
     private Pane toolPane;
 
     private MenuBar menuBar;
@@ -85,19 +83,13 @@ public class View {
         paintPane.setMinSize(1050, 695);
         paintPane.setMaxSize(1050, 695);
 
-        paintScrollPane = new ScrollPane();
-        paintScrollPane.setMinSize(1050 + 10, 695 + 10);
-        paintScrollPane.setMaxSize(1050 + 10, 695 + 10);
-        paintScrollPane.setLayoutX(150);
-        paintScrollPane.setLayoutY(25);
-        paintScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        paintScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        paintScrollPane.setFitToHeight(true);
-        paintScrollPane.setFitToWidth(true);
-        paintScrollPane.setPannable(false);
-        paintScrollPane.setContent(paintPane);
-
-        backgroundPane.getChildren().add(paintScrollPane);
+        ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(paintPane);
+        zoomableScrollPane.setMinSize(1050 + 10, 695 + 10);
+        zoomableScrollPane.setMaxSize(1050 + 10, 695 + 10);
+        zoomableScrollPane.setLayoutX(150);
+        zoomableScrollPane.setLayoutY(25);
+        
+        backgroundPane.getChildren().add(zoomableScrollPane);
         //</editor-fold>
         // tạo vùng chức năng 
         //<editor-fold defaultstate="collapse" desc="Tool Pane">
@@ -152,10 +144,6 @@ public class View {
 
         backgroundPane.getChildren().add(toolPane);
         //</editor-fold>
-    }
-
-    public <T extends Event> void setScrollPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
-        paintScrollPane.addEventFilter(eventType, eventHandler);
     }
 
     public void openImageFromOutside(EventHandler<ActionEvent> eventHandler) {

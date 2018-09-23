@@ -34,8 +34,8 @@ public class FloodFiller {
     
     private Pane pane;
 
-    public FloodFiller(Pane panee) {
-        pane = panee;
+    public FloodFiller(Pane pane) {
+        this.pane = pane;
     }
 
     public void mousePressedHandling(MouseEvent event) {
@@ -46,7 +46,7 @@ public class FloodFiller {
         startPoint = new Point2D(event.getX(), event.getY());
         fillLeeAlgorithm(startPoint);
         if (pane.getChildren().size() > 0) {
-            pane.getChildren().remove(0, pane.getChildren().size() - 1);
+            pane.getChildren().remove(0, pane.getChildren().size());
         }
         ImageView imgView = new ImageView();
         imgView.setImage(image);

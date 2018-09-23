@@ -24,7 +24,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import main.model.Model;
 import main.view.View;
 
@@ -97,10 +96,16 @@ public class Controller {
         toggleBtnGroupAction();
         colorPickerAction();
         sizeOfPenSliderAction();
-        zoomActionHandler();
     }
 
     private void mouseActionHandler() {
+        view.getPaintPane().addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                System.out.println((int)event.getX() + " " + (int)event.getY());
+            }
+
+        });
         view.getPaintPane().addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -409,25 +414,6 @@ public class Controller {
                     view.getPaintPane().setMaxSize(img.getWidth(), img.getHeight());
                     view.getPaintPane().getChildren().add(imgView);
                 }
-            }
-        });
-    }
-
-    private void zoomActionHandler() {
-        view.setScrollPaneEventHandler(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
-            @Override
-            public void handle(ScrollEvent event) {
-                if (ctrlPressed.getValue()) {
-                    double zoomFactor = 1.05;
-                    double deltaY = event.getDeltaY();
-                    if (deltaY < 0) {
-                        zoomFactor = 2.0 - zoomFactor;
-                    }
-                    view.getPaintPane().setScaleX(view.getPaintPane().getScaleY() * zoomFactor);
-                    view.getPaintPane().setScaleY(view.getPaintPane().getScaleY() * zoomFactor);
-                    event.consume(); // chặn cho scroll bar ko được chạy
-                }
-                
             }
         });
     }
