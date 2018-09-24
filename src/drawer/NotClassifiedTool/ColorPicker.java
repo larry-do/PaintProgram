@@ -35,4 +35,8 @@ public class ColorPicker {
         pixelReader = image.getPixelReader();
         return pixelReader.getColor((int) event.getX(), (int) event.getY());
     }
+
+    public Color mouseDraggedHandling(MouseEvent event) {
+        return pixelReader.getColor((int) event.getX(), (int) event.getY());
+    }
 }

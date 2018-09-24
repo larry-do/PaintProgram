@@ -22,9 +22,10 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import main.model.Model;
 import main.view.View;
 
@@ -39,8 +40,11 @@ public class Controller {
 
     private BooleanProperty ctrlPressed;
     private BooleanProperty keySPressed;
-    private BooleanBinding combineKey;
-    private BooleanProperty isWheelScroll;
+    private BooleanProperty keyZPressed;
+    private BooleanProperty keyYPressed;
+    private BooleanBinding combineKeyCtrlAndZ;
+    private BooleanBinding combineKeyCtrlAndY;
+    private BooleanBinding combineKeyCtrlAndS;
 
     private Pencil pencil;
     private Eraser eraser;
@@ -59,8 +63,8 @@ public class Controller {
     private ColorPicker colorPicker;
 
     private ToolType currentTool;
-    
-    private Stack<Image> undoStack, redoStack;
+
+    private Stack<WritableImage> undoStack, redoStack;
 
     public Controller(View v, Model m) {
         //<editor-fold defaultstate="collapsed" desc="Khởi tạo biến">
@@ -69,8 +73,11 @@ public class Controller {
 
         ctrlPressed = new SimpleBooleanProperty(false);
         keySPressed = new SimpleBooleanProperty(false);
-        combineKey = ctrlPressed.and(keySPressed);
-        isWheelScroll = new SimpleBooleanProperty(false);
+        keyZPressed = new SimpleBooleanProperty(false);
+        keyYPressed = new SimpleBooleanProperty(false);
+        combineKeyCtrlAndS = ctrlPressed.and(keySPressed);
+        combineKeyCtrlAndZ = ctrlPressed.and(keyZPressed);
+        combineKeyCtrlAndY = ctrlPressed.and(keyYPressed);
 
         pencil = new Pencil(view.getPaintPane());
         eraser = new Eraser(view.getPaintPane());
@@ -87,7 +94,7 @@ public class Controller {
         roundedRectangleDrawer = new RoundedRectangleDrawer(view.getPaintPane());
         squareTriangleDrawer = new SquareTriangleDrawer(view.getPaintPane());
         colorPicker = new ColorPicker(view.getPaintPane());
-        
+
         undoStack = new Stack<>();
         redoStack = new Stack<>();
         //</editor-fold>
@@ -104,16 +111,11 @@ public class Controller {
         toggleBtnGroupAction();
         colorChooserAction();
         sizeOfPenSliderAction();
-    }
-    
-    private void UndoRedoActionHandler(){
-        Image img = view.getImageOfPane();
-        undoStack.add(img);
-        redoStack.add(img);
+        undoRedoActionHandler();
     }
 
     private void mouseActionHandler() {
-        view.getPaintPane().addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        view.addPaintPaneEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
@@ -127,6 +129,7 @@ public class Controller {
                             break;
                         case FLOOD_FILLER:
                             floodFiller.mousePressedHandling(event);
+                            updateUndoRedo(); // vì t để hàm này khi chuột release nên khi dùng floodFiller sẽ bị lỗi
                             break;
                         case RECTANGLE:
                             rectangleDrawer.mousePressedHandling(event);
@@ -161,7 +164,9 @@ public class Controller {
                             squareTriangleDrawer.mousePressedHandling(event);
                             break;
                         case COLOR_PICKER:
-                            view.setColorChooser(colorPicker.mousePressedHandling(event));
+                            Color color = colorPicker.mousePressedHandling(event);
+                            view.setColorChooser(color);
+                            changeColorOfTools(color);
                             break;
                         default:
                             break;
@@ -171,7 +176,7 @@ public class Controller {
             }
 
         });
-        view.getPaintPane().addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+        view.addPaintPaneEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
@@ -216,6 +221,11 @@ public class Controller {
                         case SQUARE_TRIANGLE:
                             squareTriangleDrawer.mouseDraggedHandling(event);
                             break;
+                        case COLOR_PICKER:
+                            Color color = colorPicker.mouseDraggedHandling(event);
+                            view.setColorChooser(color);
+                            changeColorOfTools(color);
+                            break;
                         default:
                             break;
                     }
@@ -224,7 +234,7 @@ public class Controller {
             }
 
         });
-        view.getPaintPane().addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+        view.addPaintPaneEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
@@ -242,6 +252,9 @@ public class Controller {
                         default:
                             break;
                     }
+                    if (currentTool != ToolType.FLOOD_FILLER) {
+                        updateUndoRedo();
+                    }
                 }
                 //</editor-fold>
             }
@@ -253,10 +266,23 @@ public class Controller {
         view.setSceneEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.CONTROL) {
-                    ctrlPressed.set(true);
-                } else if (event.getCode() == KeyCode.S) {
-                    keySPressed.set(true);
+                if (null != event.getCode()) {
+                    switch (event.getCode()) {
+                        case CONTROL:
+                            ctrlPressed.set(true);
+                            break;
+                        case S:
+                            keySPressed.set(true);
+                            break;
+                        case Z:
+                            keyZPressed.set(true);
+                            break;
+                        case Y:
+                            keyYPressed.set(true);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
@@ -264,13 +290,62 @@ public class Controller {
         view.setSceneEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.CONTROL) {
-                    ctrlPressed.set(false);
-                } else if (event.getCode() == KeyCode.S) {
-                    keySPressed.set(false);
+                if (null != event.getCode()) {
+                    switch (event.getCode()) {
+                        case CONTROL:
+                            ctrlPressed.set(false);
+                            break;
+                        case S:
+                            keySPressed.set(false);
+                            break;
+                        case Z:
+                            keyZPressed.set(false);
+                            break;
+                        case Y:
+                            keyYPressed.set(false);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
+        });
+    }
+
+    private void updateUndoRedo() {
+        undoStack.add(view.getImageOfPane());
+        redoStack.removeAllElements();
+    }
+
+    private void undoRedoActionHandler() {
+        combineKeyCtrlAndZ.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    if (!undoStack.isEmpty()) {
+                        redoStack.add(undoStack.pop());
+                    }
+                    view.removeAllNodePaintPane();
+                    if (!undoStack.isEmpty()) {
+                        view.setSizePaintPane(undoStack.peek().getWidth(), undoStack.peek().getHeight());
+                        view.addNodeToPaintPane(new ImageView(undoStack.peek()));
+                    }
+                }
+            }
+        });
+        combineKeyCtrlAndY.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    if (!redoStack.isEmpty()) {
+                        view.removeAllNodePaintPane();
+                        view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
+                        view.addNodeToPaintPane(new ImageView(redoStack.peek()));
+                        undoStack.add(redoStack.pop());
+                    }
+                }
+            }
         });
     }
 
@@ -299,87 +374,91 @@ public class Controller {
         view.colorChooserAction(new EventHandler() {
             @Override
             public void handle(Event event) {
-                pencil.setColor(view.getColorOfColorPicker());
-                floodFiller.setColor(view.getColorOfColorPicker());
-                rectangleDrawer.setColor(view.getColorOfColorPicker());
-                curveLineDrawer.setColor(view.getColorOfColorPicker());
-                airbrush.setColor(view.getColorOfColorPicker());
-                brush.setColor(view.getColorOfColorPicker());
-                calligraphyPen.setColor(view.getColorOfColorPicker());
-                markerPen.setColor(view.getColorOfColorPicker());
-                ellipseDrawer.setColor(view.getColorOfColorPicker());
-                isoscelesTriangleDrawer.setColor(view.getColorOfColorPicker());
-                lineDrawer.setColor(view.getColorOfColorPicker());
-                roundedRectangleDrawer.setColor(view.getColorOfColorPicker());
-                squareTriangleDrawer.setColor(view.getColorOfColorPicker());
+                changeColorOfTools(view.getColorOfColorChooser());
             }
         });
+    }
+
+    private void changeColorOfTools(Color color) {
+        pencil.setColor(color);
+        floodFiller.setColor(color);
+        rectangleDrawer.setColor(color);
+        curveLineDrawer.setColor(color);
+        airbrush.setColor(color);
+        brush.setColor(color);
+        calligraphyPen.setColor(color);
+        markerPen.setColor(color);
+        ellipseDrawer.setColor(color);
+        isoscelesTriangleDrawer.setColor(color);
+        lineDrawer.setColor(color);
+        roundedRectangleDrawer.setColor(color);
+        squareTriangleDrawer.setColor(color);
     }
 
     private void toggleBtnGroupAction() {
         view.toggleBtnGroupAction(new ChangeListener<Toggle>() {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if (newValue.getUserData() != ToolType.CURVE_LINE) {
-                    curveLineDrawer.resetPressCount();
+                if (newValue.getUserData() != null) {
+                    if (newValue.getUserData() != ToolType.CURVE_LINE) {
+                        curveLineDrawer.resetPressCount();
+                    }
+                    switch ((ToolType) newValue.getUserData()) {
+                        case PENCIL:
+                            currentTool = ToolType.PENCIL;
+                            break;
+                        case ERASER:
+                            currentTool = ToolType.ERASER;
+                            break;
+                        case FLOOD_FILLER:
+                            currentTool = ToolType.FLOOD_FILLER;
+                            break;
+                        case RECTANGLE:
+                            currentTool = ToolType.RECTANGLE;
+                            break;
+                        case CURVE_LINE:
+                            currentTool = ToolType.CURVE_LINE;
+                            break;
+                        case AIRBRUSH:
+                            currentTool = ToolType.AIRBRUSH;
+                            break;
+                        case BRUSH:
+                            currentTool = ToolType.BRUSH;
+                            break;
+                        case CALLIGRAPHY_PEN:
+                            currentTool = ToolType.CALLIGRAPHY_PEN;
+                            break;
+                        case MARKER_PEN:
+                            currentTool = ToolType.MARKER_PEN;
+                            break;
+                        case ELLIPSE:
+                            currentTool = ToolType.ELLIPSE;
+                            break;
+                        case ISOSCELES_TRIANGLE:
+                            currentTool = ToolType.ISOSCELES_TRIANGLE;
+                            break;
+                        case LINE:
+                            currentTool = ToolType.LINE;
+                            break;
+                        case ROUNDED_RECTANGLE:
+                            currentTool = ToolType.ROUNDED_RECTANGLE;
+                            break;
+                        case SQUARE_TRIANGLE:
+                            currentTool = ToolType.SQUARE_TRIANGLE;
+                            break;
+                        case COLOR_PICKER:
+                            currentTool = ToolType.COLOR_PICKER;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                switch ((ToolType) newValue.getUserData()) {
-                    case PENCIL:
-                        currentTool = ToolType.PENCIL;
-                        break;
-                    case ERASER:
-                        currentTool = ToolType.ERASER;
-                        break;
-                    case FLOOD_FILLER:
-                        currentTool = ToolType.FLOOD_FILLER;
-                        break;
-                    case RECTANGLE:
-                        currentTool = ToolType.RECTANGLE;
-                        break;
-                    case CURVE_LINE:
-                        currentTool = ToolType.CURVE_LINE;
-                        break;
-                    case AIRBRUSH:
-                        currentTool = ToolType.AIRBRUSH;
-                        break;
-                    case BRUSH:
-                        currentTool = ToolType.BRUSH;
-                        break;
-                    case CALLIGRAPHY_PEN:
-                        currentTool = ToolType.CALLIGRAPHY_PEN;
-                        break;
-                    case MARKER_PEN:
-                        currentTool = ToolType.MARKER_PEN;
-                        break;
-                    case ELLIPSE:
-                        currentTool = ToolType.ELLIPSE;
-                        break;
-                    case ISOSCELES_TRIANGLE:
-                        currentTool = ToolType.ISOSCELES_TRIANGLE;
-                        break;
-                    case LINE:
-                        currentTool = ToolType.LINE;
-                        break;
-                    case ROUNDED_RECTANGLE:
-                        currentTool = ToolType.ROUNDED_RECTANGLE;
-                        break;
-                    case SQUARE_TRIANGLE:
-                        currentTool = ToolType.SQUARE_TRIANGLE;
-                        break;
-                    case COLOR_PICKER:
-                        currentTool = ToolType.COLOR_PICKER;
-                        break;
-                    default:
-                        break;
-
-                }
-
             }
         });
     }
 
     private void saveWithKeyBoard() {
-        combineKey.addListener(new ChangeListener<Boolean>() {
+        combineKeyCtrlAndS.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
@@ -395,7 +474,7 @@ public class Controller {
         view.exitMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (view.getPaintPane().getChildren().size() > 0) {
+                if (view.isPaintPaneEmpty()) {
                     // hỏi người dùng xem có muốn save không?
                 }
                 Platform.exit();
@@ -420,12 +499,17 @@ public class Controller {
                 Image img = model.getImage();
                 if (img != null) {
                     ImageView imgView = new ImageView(img);
-                    if (view.getPaintPane().getChildren().size() > 0) {
+                    if (view.isPaintPaneEmpty()) {
                         // hỏi người dùng xem có muốn save không?
                     }
-                    view.getPaintPane().setMinSize(img.getWidth(), img.getHeight());
-                    view.getPaintPane().setMaxSize(img.getWidth(), img.getHeight());
-                    view.getPaintPane().getChildren().add(imgView);
+                    if (img.getHeight() > view.getPaintPaneHeight()) {
+                        view.setSizePaintPane(view.getPaintPaneWidth(), img.getHeight());
+                    }
+                    if (img.getWidth() > view.getPaintPaneWidth()) {
+                        view.setSizePaintPane(img.getWidth(), view.getPaintPaneHeight());
+                    }
+                    view.addNodeToPaintPane(imgView);
+                    updateUndoRedo();
                 }
             }
         });
