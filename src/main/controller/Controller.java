@@ -9,6 +9,7 @@ import drawer.NotClassifiedTool.*;
 import drawer.PaintTool.ToolType;
 import drawer.Pens.*;
 import drawer.Shapes.*;
+import java.util.Stack;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -55,8 +56,11 @@ public class Controller {
     private LineDrawer lineDrawer;
     private RoundedRectangleDrawer roundedRectangleDrawer;
     private SquareTriangleDrawer squareTriangleDrawer;
+    private ColorPicker colorPicker;
 
     private ToolType currentTool;
+    
+    private Stack<Image> undoStack, redoStack;
 
     public Controller(View v, Model m) {
         //<editor-fold defaultstate="collapsed" desc="Khởi tạo biến">
@@ -82,6 +86,10 @@ public class Controller {
         lineDrawer = new LineDrawer(view.getPaintPane());
         roundedRectangleDrawer = new RoundedRectangleDrawer(view.getPaintPane());
         squareTriangleDrawer = new SquareTriangleDrawer(view.getPaintPane());
+        colorPicker = new ColorPicker(view.getPaintPane());
+        
+        undoStack = new Stack<>();
+        redoStack = new Stack<>();
         //</editor-fold>
 
         // set default tool
@@ -94,18 +102,17 @@ public class Controller {
         saveAsMenuAction();
         saveWithKeyBoard();
         toggleBtnGroupAction();
-        colorPickerAction();
+        colorChooserAction();
         sizeOfPenSliderAction();
+    }
+    
+    private void UndoRedoActionHandler(){
+        Image img = view.getImageOfPane();
+        undoStack.add(img);
+        redoStack.add(img);
     }
 
     private void mouseActionHandler() {
-        view.getPaintPane().addEventHandler(MouseEvent.ANY, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                System.out.println((int)event.getX() + " " + (int)event.getY());
-            }
-
-        });
         view.getPaintPane().addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -152,6 +159,9 @@ public class Controller {
                             break;
                         case SQUARE_TRIANGLE:
                             squareTriangleDrawer.mousePressedHandling(event);
+                            break;
+                        case COLOR_PICKER:
+                            view.setColorChooser(colorPicker.mousePressedHandling(event));
                             break;
                         default:
                             break;
@@ -285,8 +295,8 @@ public class Controller {
         });
     }
 
-    private void colorPickerAction() {
-        view.colorPickerAction(new EventHandler() {
+    private void colorChooserAction() {
+        view.colorChooserAction(new EventHandler() {
             @Override
             public void handle(Event event) {
                 pencil.setColor(view.getColorOfColorPicker());
@@ -356,6 +366,9 @@ public class Controller {
                     case SQUARE_TRIANGLE:
                         currentTool = ToolType.SQUARE_TRIANGLE;
                         break;
+                    case COLOR_PICKER:
+                        currentTool = ToolType.COLOR_PICKER;
+                        break;
                     default:
                         break;
 
@@ -372,7 +385,7 @@ public class Controller {
                 if (newValue) {
                     ctrlPressed.set(false);
                     keySPressed.set(false);
-                    model.writeImage(view.getRenderedImage());
+                    model.writeImage(view.getImageOfPane());
                 }
             }
         });
@@ -395,7 +408,7 @@ public class Controller {
         view.saveAsMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                model.writeImage(view.getRenderedImage());
+                model.writeImage(view.getImageOfPane());
             }
         });
     }

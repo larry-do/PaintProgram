@@ -6,9 +6,7 @@
 package main.view;
 
 import drawer.PaintTool.ToolType;
-import java.awt.image.RenderedImage;
 import javafx.beans.value.ChangeListener;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -41,9 +39,9 @@ public class View {
 
     private ToggleGroup toggleGroup;
     private ToggleButton pencilBtn, eraserBtn, floodFillerBtn, rectangleDrawerBtn, curveLineDrawerBtn;
-    private ToggleButton airbrushBtn;
+    private ToggleButton airbrushBtn, colorPickerBtn;
 
-    private ColorPicker colorPicker;
+    private ColorPicker colorChooser;
 
     private Slider sizeOfPenSlider;
 
@@ -99,7 +97,7 @@ public class View {
         toolPane.setLayoutY(25);
         toolPane.setStyle("-fx-background-color: gray");
 
-        colorPicker = new ColorPicker(Color.BLACK);
+        colorChooser = new ColorPicker(Color.BLACK);
 
         sizeOfPenSlider = new Slider();
         sizeOfPenSlider.setMax(30);
@@ -132,15 +130,13 @@ public class View {
         airbrushBtn = new ToggleButton("airbrush");
         airbrushBtn.setToggleGroup(toggleGroup);
         airbrushBtn.setUserData(ToolType.AIRBRUSH);
+        
+        colorPickerBtn = new ToggleButton("colorPicker");
+        colorPickerBtn.setToggleGroup(toggleGroup);
+        colorPickerBtn.setUserData(ToolType.COLOR_PICKER);
 
-        toolPane.getChildren().add(sizeOfPenSlider);
-        toolPane.getChildren().add(colorPicker);
-        toolPane.getChildren().add(pencilBtn);
-        toolPane.getChildren().add(eraserBtn);
-        toolPane.getChildren().add(floodFillerBtn);
-        toolPane.getChildren().add(rectangleDrawerBtn);
-        toolPane.getChildren().add(curveLineDrawerBtn);
-        toolPane.getChildren().add(airbrushBtn);
+        toolPane.getChildren().addAll(sizeOfPenSlider, colorChooser, pencilBtn, eraserBtn, floodFillerBtn
+                                    , rectangleDrawerBtn, curveLineDrawerBtn, airbrushBtn, colorPickerBtn);
 
         backgroundPane.getChildren().add(toolPane);
         //</editor-fold>
@@ -166,19 +162,18 @@ public class View {
         toggleGroup.selectedToggleProperty().addListener(listener);
     }
 
-    public void colorPickerAction(EventHandler eventHandler) {
-        colorPicker.setOnAction(eventHandler);
+    public void colorChooserAction(EventHandler eventHandler) {
+        colorChooser.setOnAction(eventHandler);
     }
 
     public void sizeOfPenSliderAction(ChangeListener<Number> listener) {
         sizeOfPenSlider.valueProperty().addListener(listener);
     }
 
-    public RenderedImage getRenderedImage() {
+    public WritableImage getImageOfPane() {
         WritableImage image = new WritableImage((int) paintPane.getWidth(), (int) paintPane.getHeight());
         paintPane.snapshot(null, image);
-        RenderedImage renderedImage = SwingFXUtils.fromFXImage(image, null);
-        return renderedImage;
+        return image;
     }
 
     public void showAlertMessage(String message) {
@@ -192,7 +187,7 @@ public class View {
     }
 
     public Color getColorOfColorPicker() {
-        return colorPicker.getValue();
+        return colorChooser.getValue();
     }
 
     public Scene getScene() { // mình ko thích cái hàm này lắm
@@ -201,6 +196,10 @@ public class View {
 
     public Pane getPaintPane() {
         return paintPane;
+    }
+
+    public void setColorChooser(Color color) {
+        colorChooser.setValue(color);
     }
 
 }

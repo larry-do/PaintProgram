@@ -8,6 +8,7 @@ package main.model;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
@@ -26,7 +27,8 @@ public class Model {
 
     }
 
-    public void writeImage(RenderedImage renderedImage) {
+    public void writeImage(Image image) {
+        RenderedImage renderedImage = SwingFXUtils.fromFXImage(image, null);
         fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.png", "*.png"));
         fileChooser.setInitialFileName("Untitled");
@@ -48,7 +50,8 @@ public class Model {
         fileChooser = new FileChooser();
         String path = System.getProperty("user.home") + "\\Desktop";
         fileChooser.setInitialDirectory(new File(path));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.png", "*.png"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"
+                                                                                , "*.bmp", "*.jfif", "*.gif"));
         file = fileChooser.showOpenDialog(null);
         if (file != null) {
             img = new Image(file.toURI().toString());
