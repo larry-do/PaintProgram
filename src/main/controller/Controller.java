@@ -19,12 +19,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import main.model.Model;
 import main.view.View;
@@ -112,6 +114,7 @@ public class Controller {
         colorChooserAction();
         sizeOfPenSliderAction();
         undoRedoActionHandler();
+        addZoomPaintPaneHandler();
     }
 
     private void mouseActionHandler() {
@@ -165,7 +168,7 @@ public class Controller {
                             break;
                         case COLOR_PICKER:
                             Color color = colorPicker.mousePressedHandling(event);
-                            view.setColorChooser(color);
+                            view.setColorInColorChooser(color);
                             changeColorOfTools(color);
                             break;
                         default:
@@ -223,7 +226,7 @@ public class Controller {
                             break;
                         case COLOR_PICKER:
                             Color color = colorPicker.mouseDraggedHandling(event);
-                            view.setColorChooser(color);
+                            view.setColorInColorChooser(color);
                             changeColorOfTools(color);
                             break;
                         default:
@@ -263,7 +266,7 @@ public class Controller {
     }
 
     private void keyboardActionHandler() {
-        view.setSceneEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+        view.addEventHandlerInScene(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 if (null != event.getCode()) {
@@ -287,7 +290,7 @@ public class Controller {
             }
 
         });
-        view.setSceneEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
+        view.addEventHandlerInScene(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 if (null != event.getCode()) {
@@ -350,7 +353,7 @@ public class Controller {
     }
 
     private void sizeOfPenSliderAction() {
-        view.sizeOfPenSliderAction(new ChangeListener<Number>() {
+        view.addListenerInSlider(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 pencil.setSizeOfPen(newValue.doubleValue());
@@ -371,10 +374,10 @@ public class Controller {
     }
 
     private void colorChooserAction() {
-        view.colorChooserAction(new EventHandler() {
+        view.addListenerInColorChooser(new ChangeListener<Color>() {
             @Override
-            public void handle(Event event) {
-                changeColorOfTools(view.getColorOfColorChooser());
+            public void changed(ObservableValue<? extends Color> observable, Color oldValue, Color newValue) {
+                changeColorOfTools(newValue);
             }
         });
     }
@@ -396,7 +399,7 @@ public class Controller {
     }
 
     private void toggleBtnGroupAction() {
-        view.toggleBtnGroupAction(new ChangeListener<Toggle>() {
+        view.addListenerInToggleGroup(new ChangeListener<Toggle>() {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 if (newValue.getUserData() != null) {
@@ -510,6 +513,18 @@ public class Controller {
                     }
                     view.addNodeToPaintPane(imgView);
                     updateUndoRedo();
+                }
+            }
+        });
+    }
+
+    private void addZoomPaintPaneHandler() {
+        view.addZoomableScrollPaneEventHandler(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if (event.isControlDown()) {
+                    event.consume();
+                    view.zoomPaintPane(event.getTextDeltaY(), new Point2D(event.getX(), event.getY()));
                 }
             }
         });

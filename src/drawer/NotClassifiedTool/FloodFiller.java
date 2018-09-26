@@ -39,7 +39,7 @@ public class FloodFiller {
     }
 
     public void mousePressedHandling(MouseEvent event) {
-        image = new WritableImage((int) pane.getMinWidth(), (int) pane.getMinHeight());
+        image = new WritableImage((int) pane.getPrefWidth(), (int) pane.getPrefHeight());
         pane.snapshot(null, image);
         pixelReader = image.getPixelReader();
         pixelWriter = image.getPixelWriter();

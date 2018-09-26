@@ -5,12 +5,12 @@
  */
 package main.view;
 
-import drawer.PaintTool.ToolType;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,155 +25,142 @@ import javafx.scene.paint.Color;
  */
 public class View {
 
-    private final int WIDTH = 1200;
-    private final int HEIGHT = 720;
+    private final int SCENE_WIDTH = 1200;
+    private final int SCENE_HEIGHT = 720;
+    private final int X_MENUBAR = 0, Y_MENUBAR = 0;
+    private final int W_MENUBAR = SCENE_WIDTH + 10, H_MENUBAR = 25;
+    private final int X_TOOLBAR = 0, Y_TOOLBAR = H_MENUBAR;
+    private final int W_TOOLBAR = 90, H_TOOLBAR = SCENE_HEIGHT - H_MENUBAR + 10;
+    private final int X_PAINTPANE = W_TOOLBAR, Y_PAINTPANE = H_MENUBAR;
+    private final int W_PAINTPANE = SCENE_WIDTH - W_TOOLBAR + 10, H_PAINTPANE = SCENE_HEIGHT - H_MENUBAR + 10;
 
     private Scene scene;
     private Pane backgroundPane;
 
-    private Pane paintPane;
-    private ZoomableScrollPane zoomableScrollPane;
-    private Pane toolPane;
+    private PaintArea paintScrollPane;
 
-    private MenuBar menuBar;
-    private Menu fileMenu, aboutMenu;
-    private MenuItem newMenuItem, openMenuItem, saveMenuItem, saveAsMenuItem, exitMenuItem, aboutMenuItem;
+    private MenuBarView menuBarView;
 
-    private ToggleGroup toggleGroup;
-    private RadioButton pencilBtn, eraserBtn, floodFillerBtn, rectangleDrawerBtn, curveLineDrawerBtn;
-    private RadioButton airbrushBtn, colorPickerBtn;
-
-    private ColorPicker colorChooser;
-
-    private Slider sizeOfPenSlider;
+    private ToolBarView toolBarView;
 
     public View() {
         // khởi tạo scene, backgroundPane và primaryStage
         //<editor-fold defaultstate="collapsed" desc="Construct scene, stage, bgPane">
         backgroundPane = new Pane();
-        backgroundPane.setMinSize(WIDTH, HEIGHT);
-        scene = new Scene(backgroundPane, WIDTH, HEIGHT);
+        backgroundPane.setMinSize(SCENE_WIDTH, SCENE_HEIGHT);
+        scene = new Scene(backgroundPane, SCENE_WIDTH, SCENE_HEIGHT);
         //</editor-fold>
         // tạo menu bar
         //<editor-fold defaultstate="collapsed" desc="Menu Bar">
-        menuBar = new MenuBar();
-
-        fileMenu = new Menu("File");
-        newMenuItem = new MenuItem("New");
-        openMenuItem = new MenuItem("Open");
-        saveMenuItem = new MenuItem("Save");
-        saveAsMenuItem = new MenuItem("Save as...");
-        exitMenuItem = new MenuItem("Exit");
-        fileMenu.getItems().addAll(newMenuItem, openMenuItem, saveMenuItem, saveAsMenuItem, exitMenuItem);
-
-        aboutMenu = new Menu("About");
-        aboutMenuItem = new MenuItem("About");
-        aboutMenu.getItems().addAll(aboutMenuItem);
-
-        menuBar.getMenus().addAll(fileMenu, aboutMenu);
-        menuBar.setPrefWidth(WIDTH + 10);
-        menuBar.setPrefHeight(25);
-
-        backgroundPane.getChildren().add(menuBar);
+        menuBarView = new MenuBarView();
+        menuBarView.setPrefSize(W_MENUBAR, H_MENUBAR);
+        menuBarView.setLayoutX(X_MENUBAR);
+        menuBarView.setLayoutY(Y_MENUBAR);
+        backgroundPane.getChildren().add(menuBarView);
         //</editor-fold>
         // tạo vùng vẽ
         //<editor-fold defaultstate="collapse" desc="Paint Pane">
-        paintPane = new Pane();
-        paintPane.setStyle("-fx-background-color: white");
-        paintPane.setMinSize(1050, 695);
-        paintPane.setMaxSize(1050, 695);
-        paintPane.setPrefSize(1050, 695);
 
-        zoomableScrollPane = new ZoomableScrollPane(paintPane);
-        zoomableScrollPane.setMinSize(1050 + 10, 695 + 10);
-        zoomableScrollPane.setMaxSize(1050 + 10, 695 + 10);
-        zoomableScrollPane.setLayoutX(150);
-        zoomableScrollPane.setLayoutY(25);
+        paintScrollPane = new PaintArea();
 
-        backgroundPane.getChildren().add(zoomableScrollPane);
+        paintScrollPane.setPrefSize(W_PAINTPANE, H_PAINTPANE);
+        paintScrollPane.setLayoutX(X_PAINTPANE);
+        paintScrollPane.setLayoutY(Y_PAINTPANE);
+
+        backgroundPane.getChildren().add(paintScrollPane);
         //</editor-fold>
         // tạo vùng chức năng 
         //<editor-fold defaultstate="collapse" desc="Tool Pane">
-        toolPane = new VBox();
-        toolPane.setMinSize(150, 695 + 10);
-        toolPane.setLayoutX(0);
-        toolPane.setLayoutY(25);
-        toolPane.setStyle("-fx-background-color: gray");
+        toolBarView = new ToolBarView();
+        toolBarView.setPrefSize(W_TOOLBAR, H_TOOLBAR);
+        toolBarView.setLayoutX(X_TOOLBAR);
+        toolBarView.setLayoutY(Y_TOOLBAR);
 
-        colorChooser = new ColorPicker(Color.BLACK);
-
-        sizeOfPenSlider = new Slider();
-        sizeOfPenSlider.setMax(30);
-        sizeOfPenSlider.setMin(2);
-        sizeOfPenSlider.setValue(2);
-
-        toggleGroup = new ToggleGroup();
-
-        pencilBtn = new RadioButton("pencil");
-        pencilBtn.setSelected(true);
-        pencilBtn.setToggleGroup(toggleGroup);
-        pencilBtn.setUserData(ToolType.PENCIL);
-        //pencilBtn.getStyleClass().remove("radio-button");
-        //pencilBtn.getStyleClass().add("toggle-button");
-        //pencilBtn.setGraphic(new ImageView(new Image("icon/home-icon.png")));
-
-        eraserBtn = new RadioButton("eraser");
-        eraserBtn.setToggleGroup(toggleGroup);
-        eraserBtn.setUserData(ToolType.ERASER);
-
-        floodFillerBtn = new RadioButton("floodFill");
-        floodFillerBtn.setToggleGroup(toggleGroup);
-        floodFillerBtn.setUserData(ToolType.FLOOD_FILLER);
-
-        rectangleDrawerBtn = new RadioButton("rectangle");
-        rectangleDrawerBtn.setToggleGroup(toggleGroup);
-        rectangleDrawerBtn.setUserData(ToolType.RECTANGLE);
-
-        curveLineDrawerBtn = new RadioButton("curveLine");
-        curveLineDrawerBtn.setToggleGroup(toggleGroup);
-        curveLineDrawerBtn.setUserData(ToolType.CURVE_LINE);
-
-        airbrushBtn = new RadioButton("airbrush");
-        airbrushBtn.setToggleGroup(toggleGroup);
-        airbrushBtn.setUserData(ToolType.AIRBRUSH);
-
-        colorPickerBtn = new RadioButton("colorPicker");
-        colorPickerBtn.setToggleGroup(toggleGroup);
-        colorPickerBtn.setUserData(ToolType.COLOR_PICKER);
-
-        toolPane.getChildren().addAll(sizeOfPenSlider, colorChooser, pencilBtn, eraserBtn, floodFillerBtn,
-                rectangleDrawerBtn, curveLineDrawerBtn, airbrushBtn, colorPickerBtn);
-
-        backgroundPane.getChildren().add(toolPane);
+        backgroundPane.getChildren().add(toolBarView);
         //</editor-fold>
     }
 
     public void openImageFromOutside(EventHandler<ActionEvent> eventHandler) {
-        openMenuItem.setOnAction(eventHandler);
-    }
-
-    public <T extends Event> void setSceneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
-        scene.addEventFilter(eventType, eventHandler);
+        menuBarView.addEventHandlerInOpenMenuItem(eventHandler);
     }
 
     public void exitMenuAction(EventHandler<ActionEvent> eventHandler) {
-        exitMenuItem.setOnAction(eventHandler);
+        menuBarView.addEventHandlerInExitMenuItem(eventHandler);
     }
 
     public void saveAsMenuAction(EventHandler<ActionEvent> eventHandler) {
-        saveAsMenuItem.setOnAction(eventHandler);
+        menuBarView.addEventHandlerInSaveAsMenuItem(eventHandler);
     }
 
-    public void toggleBtnGroupAction(ChangeListener<Toggle> listener) {
-        toggleGroup.selectedToggleProperty().addListener(listener);
+    public <T extends Event> void addEventHandlerInScene(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+        scene.addEventFilter(eventType, eventHandler);
     }
 
-    public void colorChooserAction(EventHandler eventHandler) {
-        colorChooser.setOnAction(eventHandler);
+    public void addListenerInToggleGroup(ChangeListener<Toggle> listener) {
+        toolBarView.addListenerInToggleGroup(listener);
     }
 
-    public void sizeOfPenSliderAction(ChangeListener<Number> listener) {
-        sizeOfPenSlider.valueProperty().addListener(listener);
+    public void addListenerInColorChooser(ChangeListener<Color> listener) {
+        toolBarView.addListenerInColorChooser(listener);
+    }
+
+    public void addListenerInSlider(ChangeListener<Number> listener) {
+        toolBarView.addListenerInSlider(listener);
+    }
+
+    public void setColorInColorChooser(Color color) {
+        toolBarView.setColorInColorChooser(color);
+    }
+
+    // các hàm liên quan đến Paint Pane
+    //<editor-fold defaultstate="collapsed" desc="Paint Pane Funtion">
+    public Pane getPaintPane() {
+        return paintScrollPane.getPaintPane();
+    }
+
+    public <T extends Event> void addZoomableScrollPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+        paintScrollPane.addZoomNodeEventHandler(eventType, eventHandler);
+    }
+
+    public void zoomPaintPane(double wheelDelta, Point2D mousePoint) {
+        paintScrollPane.zoomOnTarget(wheelDelta, mousePoint);
+    }
+
+    public void setSizePaintPane(double width, double height) {
+        paintScrollPane.setSizePaintPane(width, height);
+    }
+
+    public <T extends Event> void addPaintPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+        paintScrollPane.addPaintPaneEventHandler(eventType, eventHandler);
+    }
+
+    public WritableImage getImageOfPane() {
+        return paintScrollPane.getImageOfPane();
+    }
+
+    public void addNodeToPaintPane(Node node) {
+        paintScrollPane.addNodeToPaintPane(node);
+    }
+
+    public void removeAllNodePaintPane() {
+        paintScrollPane.removeAllNodePaintPane();
+    }
+
+    public boolean isPaintPaneEmpty() {
+        return paintScrollPane.isPaintPaneEmpty();
+    }
+
+    public double getPaintPaneWidth() {
+        return paintScrollPane.getPaintPaneWidth();
+    }
+
+    public double getPaintPaneHeight() {
+        return paintScrollPane.getPaintPaneHeight();
+    }
+    //</editor-fold>
+
+    public Scene getScene() { // mình ko thích cái hàm này lắm
+        return scene;
     }
 
     public void showAlertMessage(String message) {
@@ -185,57 +172,4 @@ public class View {
 
         alert.showAndWait();
     }
-
-    public Color getColorOfColorChooser() {
-        return colorChooser.getValue();
-    }
-
-    public Scene getScene() { // mình ko thích cái hàm này lắm
-        return scene;
-    }
-
-    public void setColorChooser(Color color) {
-        colorChooser.setValue(color);
-    }
-    // các hàm liên quan đến Paint Pane
-    public Pane getPaintPane() {
-        return paintPane;
-    }
-
-    public void setSizePaintPane(double width, double height) {
-        paintPane.setMinSize(width, height);
-        paintPane.setMaxSize(width, height);
-        paintPane.setPrefSize(width, height);
-    }
-
-    public <T extends Event> void addPaintPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
-        paintPane.addEventHandler(eventType, eventHandler);
-    }
-
-    public WritableImage getImageOfPane() {
-        WritableImage image = new WritableImage((int) paintPane.getPrefWidth(), (int) paintPane.getPrefHeight());
-        paintPane.snapshot(null, image);
-        return image;
-    }
-    
-    public void addNodeToPaintPane(Node node){
-        paintPane.getChildren().add(node);
-    }
-    
-    public void removeAllNodePaintPane(){
-        paintPane.getChildren().remove(0, paintPane.getChildren().size());
-    }
-    
-    public boolean isPaintPaneEmpty(){
-        return paintPane.getChildren().isEmpty();
-    }
-    
-    public double getPaintPaneWidth(){
-        return paintPane.getPrefWidth();
-    }
-    
-    public double getPaintPaneHeight(){
-        return paintPane.getPrefHeight();
-    }
-
 }

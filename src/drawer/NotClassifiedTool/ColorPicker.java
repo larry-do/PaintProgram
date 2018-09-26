@@ -30,7 +30,7 @@ public class ColorPicker {
     }
 
     public Color mousePressedHandling(MouseEvent event) {
-        image = new WritableImage((int) pane.getMinWidth(), (int) pane.getMinHeight());
+        image = new WritableImage((int) pane.getPrefWidth(), (int) pane.getPrefHeight());
         pane.snapshot(null, image);
         pixelReader = image.getPixelReader();
         return pixelReader.getColor((int) event.getX(), (int) event.getY());

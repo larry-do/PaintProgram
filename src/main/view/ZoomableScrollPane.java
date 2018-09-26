@@ -5,13 +5,15 @@
  */
 package main.view;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 
 /**
@@ -25,30 +27,22 @@ public class ZoomableScrollPane extends ScrollPane {
     private Node paintPane;
     private Node target;
     private Node zoomNode;
+    private Node centerNode;
 
-    public ZoomableScrollPane(Node node) {
+    public ZoomableScrollPane() {
         super(); // gọi đến khởi tạo Pane();
-        this.paintPane = node;
-        this.target = new Pane(this.paintPane);
-        this.zoomNode = new Group(target);
-        this.setContent(outerNode(zoomNode));
-
-        this.setPannable(false);
-        this.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        this.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        this.setFitToHeight(true);
-        this.setFitToWidth(true);
     }
 
-    private Node outerNode(Node node) {
-        Node outNode = centerNode(node);
-        outNode.setOnScroll((ScrollEvent e) -> {
-            if (e.isControlDown()) {
-                e.consume();
-                onScroll(e.getTextDeltaY(), new Point2D(e.getX(), e.getY()));
-            }
-        });
-        return outNode;
+    public void setTargetNode(Node node) {
+        paintPane = node;
+        target = new Pane(this.paintPane);
+        zoomNode = new Group(target);
+        centerNode = centerNode(zoomNode);
+        setContent(centerNode);
+    }
+
+    public <T extends Event> void addZoomNodeEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+        centerNode.addEventHandler(eventType, eventHandler);
     }
 
     private Node centerNode(Node node) {
@@ -62,7 +56,7 @@ public class ZoomableScrollPane extends ScrollPane {
         target.setScaleY(scaleValue);
     }
 
-    private void onScroll(double wheelDelta, Point2D mousePoint) {
+    public void zoomOnTarget(double wheelDelta, Point2D mousePoint) {
         double zoomFactor = Math.exp(wheelDelta * zoomIntensity);
 
         Bounds innerBounds = zoomNode.getLayoutBounds();
