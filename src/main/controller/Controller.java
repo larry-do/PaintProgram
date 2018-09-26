@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Toggle;
@@ -44,9 +43,11 @@ public class Controller {
     private BooleanProperty keySPressed;
     private BooleanProperty keyZPressed;
     private BooleanProperty keyYPressed;
+    private BooleanProperty keyVPressed;
     private BooleanBinding combineKeyCtrlAndZ;
     private BooleanBinding combineKeyCtrlAndY;
     private BooleanBinding combineKeyCtrlAndS;
+    private BooleanBinding combineKeyCtrlAndV;
 
     private Pencil pencil;
     private Eraser eraser;
@@ -77,9 +78,11 @@ public class Controller {
         keySPressed = new SimpleBooleanProperty(false);
         keyZPressed = new SimpleBooleanProperty(false);
         keyYPressed = new SimpleBooleanProperty(false);
+        keyVPressed = new SimpleBooleanProperty(false);
         combineKeyCtrlAndS = ctrlPressed.and(keySPressed);
         combineKeyCtrlAndZ = ctrlPressed.and(keyZPressed);
         combineKeyCtrlAndY = ctrlPressed.and(keyYPressed);
+        combineKeyCtrlAndV = ctrlPressed.and(keyVPressed);
 
         pencil = new Pencil(view.getPaintPane());
         eraser = new Eraser(view.getPaintPane());
@@ -115,6 +118,7 @@ public class Controller {
         sizeOfPenSliderAction();
         undoRedoActionHandler();
         addZoomPaintPaneHandler();
+        copyAndPasteImage();
     }
 
     private void mouseActionHandler() {
@@ -283,6 +287,9 @@ public class Controller {
                         case Y:
                             keyYPressed.set(true);
                             break;
+                        case V:
+                            keyVPressed.set(true);
+                            break;
                         default:
                             break;
                     }
@@ -306,6 +313,9 @@ public class Controller {
                             break;
                         case Y:
                             keyYPressed.set(false);
+                            break;
+                        case V:
+                            keyVPressed.set(false);
                             break;
                         default:
                             break;
@@ -346,6 +356,31 @@ public class Controller {
                         view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
                         view.addNodeToPaintPane(new ImageView(redoStack.peek()));
                         undoStack.add(redoStack.pop());
+                    }
+                }
+            }
+        });
+    }
+
+    private void copyAndPasteImage() {
+        combineKeyCtrlAndV.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    Image img = model.getImageFromClipboard();
+                    if (img != null) {
+                        ImageView imgView = new ImageView(img);
+                        if (view.isPaintPaneEmpty()) {
+                            // hỏi người dùng xem có muốn save không?
+                        }
+                        if (img.getHeight() > view.getPaintPaneHeight()) {
+                            view.setSizePaintPane(view.getPaintPaneWidth(), img.getHeight());
+                        }
+                        if (img.getWidth() > view.getPaintPaneWidth()) {
+                            view.setSizePaintPane(img.getWidth(), view.getPaintPaneHeight());
+                        }
+                        view.addNodeToPaintPane(imgView);
+                        updateUndoRedo();
                     }
                 }
             }
@@ -409,6 +444,7 @@ public class Controller {
                     switch ((ToolType) newValue.getUserData()) {
                         case PENCIL:
                             currentTool = ToolType.PENCIL;
+                            view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"));
                             break;
                         case ERASER:
                             currentTool = ToolType.ERASER;
@@ -499,7 +535,7 @@ public class Controller {
         view.openImageFromOutside(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Image img = model.getImage();
+                Image img = model.getImageFromFile();
                 if (img != null) {
                     ImageView imgView = new ImageView(img);
                     if (view.isPaintPaneEmpty()) {

@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -156,6 +157,10 @@ public class View {
 
     public double getPaintPaneHeight() {
         return paintScrollPane.getPaintPaneHeight();
+    }
+
+    public void setImageOfCursorInPaintPane(Image img) {
+        paintScrollPane.setImageOfCursorInPaintPane(img);
     }
     //</editor-fold>
 

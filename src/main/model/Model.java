@@ -8,8 +8,10 @@ package main.model;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 
@@ -45,18 +47,26 @@ public class Model {
         }
     }
 
-    public Image getImage() {
+    public Image getImageFromFile() {
         Image img = null;
         fileChooser = new FileChooser();
         String path = System.getProperty("user.home") + "\\Desktop";
         fileChooser.setInitialDirectory(new File(path));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"
-                                                                                , "*.bmp", "*.jfif", "*.gif"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg",
+                "*.bmp", "*.jfif", "*.gif"));
         file = fileChooser.showOpenDialog(null);
         if (file != null) {
             img = new Image(file.toURI().toString());
         }
         return img;
+    }
 
+    public Image getImageFromClipboard() {
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if(clipboard.hasFiles()){
+            List<File> filesList = clipboard.getFiles();
+            return new Image(filesList.get(filesList.size() - 1).toURI().toString());
+        }
+        return null;
     }
 }

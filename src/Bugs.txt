@@ -1,0 +1,2 @@
+1. Vẽ tràn ra paintPane được.
+2. Zoom lên thì không thấy pixel của nét vẽ, khi đổ màu thì thấy nhưng mờ, lưu lại thì vẫn bình thường có pixel

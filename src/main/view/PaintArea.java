@@ -8,8 +8,10 @@ package main.view;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 
@@ -30,6 +32,7 @@ public class PaintArea extends ZoomableScrollPane {
         paintPane = new Pane();
         paintPane.setStyle("-fx-background-color: white");
         paintPane.setPrefSize(DEFAULT_PAINT_WIDTH, DEFAULT_PAINT_HEIGHT);
+        setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"));
 
         setTargetNode(paintPane);
         setPannable(false);
@@ -44,8 +47,6 @@ public class PaintArea extends ZoomableScrollPane {
     }
 
     public void setSizePaintPane(double width, double height) {
-        //paintPane.setMinSize(width, height);
-        //paintPane.setMaxSize(width, height);
         paintPane.setPrefSize(width, height);
     }
 
@@ -77,5 +78,9 @@ public class PaintArea extends ZoomableScrollPane {
 
     public double getPaintPaneHeight() {
         return paintPane.getPrefHeight();
+    }
+
+    public void setImageOfCursorInPaintPane(Image img) {
+        paintPane.setCursor(new ImageCursor(img));
     }
 }
