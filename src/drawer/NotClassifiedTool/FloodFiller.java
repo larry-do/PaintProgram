@@ -1,62 +1,45 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package drawer.NotClassifiedTool;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
-/**
- *
- * @author Admin
- */
 public class FloodFiller {
 
     private Point2D startPoint;
 
-    private Color color = Color.BLACK;
-
-    private WritableImage image;
+    private Color color;
 
     private PixelReader pixelReader;
 
     private PixelWriter pixelWriter;
-    
-    private Pane pane;
 
-    public FloodFiller(Pane pane) {
-        this.pane = pane;
+    private double width, height;
+
+    public FloodFiller() {
+        color = Color.BLACK;
     }
 
-    public void mousePressedHandling(MouseEvent event) {
-        image = new WritableImage((int) pane.getPrefWidth(), (int) pane.getPrefHeight());
-        pane.snapshot(null, image);
+    public Node mousePressedHandling(MouseEvent event, WritableImage image) {
         pixelReader = image.getPixelReader();
         pixelWriter = image.getPixelWriter();
         startPoint = new Point2D(event.getX(), event.getY());
+        width = image.getWidth();
+        height = image.getHeight();
         fillLeeAlgorithm(startPoint);
-        if (pane.getChildren().size() > 0) {
-            pane.getChildren().remove(0, pane.getChildren().size());
-        }
         ImageView imgView = new ImageView();
         imgView.setImage(image);
-        pane.getChildren().add(imgView);
+        return imgView;
     }
 
     private void fillLeeAlgorithm(Point2D startPoint) {
-
-        double width = image.getWidth();
-        double height = image.getHeight();
 
         Color startColor = pixelReader.getColor((int) startPoint.getX(), (int) startPoint.getY());
         if (startColor.equals(color)) {

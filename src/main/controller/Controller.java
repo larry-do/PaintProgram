@@ -5,10 +5,12 @@
  */
 package main.controller;
 
-import drawer.NotClassifiedTool.*;
-import drawer.PaintTool.ToolType;
+import drawer.NotClassifiedTool.ColorPicker;
+import drawer.NotClassifiedTool.FloodFiller;
 import drawer.Pens.*;
 import drawer.Shapes.*;
+import drawer.Tool.ToolType;
+import java.util.ArrayList;
 import java.util.Stack;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -16,17 +18,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.event.*;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.Toggle;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.image.*;
+import javafx.scene.input.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import main.model.Model;
 import main.view.View;
 
@@ -49,28 +48,22 @@ public class Controller {
     private BooleanBinding combineKeyCtrlAndS;
     private BooleanBinding combineKeyCtrlAndV;
 
-    private Pencil pencil;
-    private Eraser eraser;
-    private FloodFiller floodFiller;
     private RectangleDrawer rectangleDrawer;
+    private RoundedRectangleDrawer roundedRectangleDrawer;
+    private SquareTriangleDrawer squareTriangleDrawer;
     private CurveLineDrawer curveLineDrawer;
+    private Pencil pencil;
     private Airbrush airbrush;
     private Brush brush;
     private CalligraphyPen calligraphyPen;
-    private MarkerPen markerPen;
-    private EllipseDrawer ellipseDrawer;
-    private IsoscelesTriangleDrawer isoscelesTriangleDrawer;
-    private LineDrawer lineDrawer;
-    private RoundedRectangleDrawer roundedRectangleDrawer;
-    private SquareTriangleDrawer squareTriangleDrawer;
     private ColorPicker colorPicker;
+    private FloodFiller floodFiller;
 
     private ToolType currentTool;
 
     private Stack<WritableImage> undoStack, redoStack;
 
     public Controller(View v, Model m) {
-        //<editor-fold defaultstate="collapsed" desc="Khởi tạo biến">
         model = m;
         view = v;
 
@@ -84,25 +77,19 @@ public class Controller {
         combineKeyCtrlAndY = ctrlPressed.and(keyYPressed);
         combineKeyCtrlAndV = ctrlPressed.and(keyVPressed);
 
-        pencil = new Pencil(view.getPaintPane());
-        eraser = new Eraser(view.getPaintPane());
-        floodFiller = new FloodFiller(view.getPaintPane());
-        rectangleDrawer = new RectangleDrawer(view.getPaintPane());
-        curveLineDrawer = new CurveLineDrawer(view.getPaintPane());
-        airbrush = new Airbrush(view.getPaintPane());
-        brush = new Brush(view.getPaintPane());
-        calligraphyPen = new CalligraphyPen(view.getPaintPane());
-        markerPen = new MarkerPen(view.getPaintPane());
-        ellipseDrawer = new EllipseDrawer(view.getPaintPane());
-        isoscelesTriangleDrawer = new IsoscelesTriangleDrawer(view.getPaintPane());
-        lineDrawer = new LineDrawer(view.getPaintPane());
-        roundedRectangleDrawer = new RoundedRectangleDrawer(view.getPaintPane());
-        squareTriangleDrawer = new SquareTriangleDrawer(view.getPaintPane());
-        colorPicker = new ColorPicker(view.getPaintPane());
+        rectangleDrawer = new RectangleDrawer();
+        roundedRectangleDrawer = new RoundedRectangleDrawer();
+        squareTriangleDrawer = new SquareTriangleDrawer();
+        curveLineDrawer = new CurveLineDrawer();
+        pencil = new Pencil();
+        airbrush = new Airbrush();
+        brush = new Brush();
+        calligraphyPen = new CalligraphyPen();
+        colorPicker = new ColorPicker();
+        floodFiller = new FloodFiller();
 
         undoStack = new Stack<>();
         redoStack = new Stack<>();
-        //</editor-fold>
 
         // set default tool
         currentTool = ToolType.PENCIL;
@@ -122,151 +109,176 @@ public class Controller {
     }
 
     private void mouseActionHandler() {
-        view.addPaintPaneEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
-                if (null != currentTool) {
-                    switch (currentTool) {
-                        case PENCIL:
-                            pencil.mousePressedHandling(event);
-                            break;
-                        case ERASER:
-                            eraser.mousePressedHandling(event);
-                            break;
-                        case FLOOD_FILLER:
-                            floodFiller.mousePressedHandling(event);
-                            updateUndoRedo(); // vì t để hàm này khi chuột release nên khi dùng floodFiller sẽ bị lỗi
-                            break;
-                        case RECTANGLE:
-                            rectangleDrawer.mousePressedHandling(event);
-                            break;
-                        case CURVE_LINE:
-                            curveLineDrawer.mousePressedHandling(event);
-                            break;
-                        case AIRBRUSH:
-                            airbrush.mousePressedHandling(event);
-                            break;
-                        case BRUSH:
-                            brush.mousePressedHandling(event);
-                            break;
-                        case CALLIGRAPHY_PEN:
-                            calligraphyPen.mousePressedHandling(event);
-                        case MARKER_PEN:
-                            markerPen.mousePressedHandling(event);
-                            break;
-                        case ELLIPSE:
-                            ellipseDrawer.mousePressedHandling(event);
-                            break;
-                        case ISOSCELES_TRIANGLE:
-                            isoscelesTriangleDrawer.mousePressedHandling(event);
-                            break;
-                        case LINE:
-                            lineDrawer.mousePressedHandling(event);
-                            break;
-                        case ROUNDED_RECTANGLE:
-                            roundedRectangleDrawer.mousePressedHandling(event);
-                            break;
-                        case SQUARE_TRIANGLE:
-                            squareTriangleDrawer.mousePressedHandling(event);
-                            break;
-                        case COLOR_PICKER:
-                            Color color = colorPicker.mousePressedHandling(event);
-                            view.setColorInColorChooser(color);
-                            changeColorOfTools(color);
-                            break;
-                        default:
-                            break;
-                    }
+                if (isWithinPaintPane(event.getX(), event.getY())) {
+                    mousePressedHandling(event);
                 }
-                //</editor-fold>
             }
 
         });
-        view.addPaintPaneEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+        view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
-                if (null != currentTool) {
-                    switch (currentTool) {
-                        case PENCIL:
-                            pencil.mouseDraggedHandling(event);
-                            break;
-                        case ERASER:
-                            eraser.mouseDraggedHandling(event);
-                            break;
-                        case RECTANGLE:
-                            rectangleDrawer.mouseDraggedHandling(event);
-                            break;
-                        case CURVE_LINE:
-                            curveLineDrawer.mouseDraggedHandling(event);
-                            break;
-                        case AIRBRUSH:
-                            airbrush.mouseDraggedHandling(event);
-                            break;
-                        case BRUSH:
-                            brush.mouseDraggedHandling(event);
-                            break;
-                        case CALLIGRAPHY_PEN:
-                            calligraphyPen.mouseDraggedHandling(event);
-                            break;
-                        case MARKER_PEN:
-                            markerPen.mouseDraggedHandling(event);
-                            break;
-                        case ELLIPSE:
-                            ellipseDrawer.mouseDraggedHandling(event);
-                            break;
-                        case ISOSCELES_TRIANGLE:
-                            isoscelesTriangleDrawer.mouseDraggedHandling(event);
-                            break;
-                        case LINE:
-                            lineDrawer.mouseDraggedHandling(event);
-                            break;
-                        case ROUNDED_RECTANGLE:
-                            roundedRectangleDrawer.mouseDraggedHandling(event);
-                            break;
-                        case SQUARE_TRIANGLE:
-                            squareTriangleDrawer.mouseDraggedHandling(event);
-                            break;
-                        case COLOR_PICKER:
-                            Color color = colorPicker.mouseDraggedHandling(event);
-                            view.setColorInColorChooser(color);
-                            changeColorOfTools(color);
-                            break;
-                        default:
-                            break;
-                    }
+                if (isWithinPaintPane(event.getX(), event.getY())) {
+                    mouseDraggedHandling(event);
                 }
-                //</editor-fold>
             }
 
         });
-        view.addPaintPaneEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+        view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //<editor-fold defaultstate="collapsed" desc="Thực hiện tùy theo currentTool">
-                if (null != currentTool) {
-                    switch (currentTool) {
-                        case CURVE_LINE:
-                            curveLineDrawer.mouseReleasedHandling(event);
-                            break;
-                        case AIRBRUSH:
-                            airbrush.mouseReleasedHandling(event);
-                            break;
-                        case BRUSH:
-                            brush.mouseReleasedHandling(event);
-                            break;
-                        default:
-                            break;
-                    }
-                    if (currentTool != ToolType.FLOOD_FILLER) {
-                        updateUndoRedo();
-                    }
-                }
-                //</editor-fold>
+                mouseReleasedHandling(event);
             }
 
         });
+    }
+
+    private void mousePressedHandling(MouseEvent event) {
+        if (null != currentTool) {
+            Node node;
+            switch (currentTool) {
+                case RECTANGLE:
+                    node = rectangleDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case ROUNDED_RECTANGLE:
+                    node = roundedRectangleDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case SQUARE_TRIANGLE:
+                    node = squareTriangleDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case CURVE_LINE:
+                    node = curveLineDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case PENCIL:
+                    node = pencil.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case AIRBRUSH:
+                    double t = airbrush.getStrokeWidth() * 1.5;
+                    while (t-- > 0) {
+                        view.addNodeToPaintPane(airbrush.mousePressedHandling(event));
+                    }
+                    break;
+                case BRUSH:
+                    view.addNodeToPaintPane(brush.mousePressedHandling(event));
+                    break;
+                case CALLIGRAPHY_PEN:
+                    ArrayList<Line> list = calligraphyPen.mousePressedHandling(event);
+                    view.addNodeToPaintPane(list.toArray(new Line[list.size()]));
+                    break;
+                case COLOR_PICKER:
+                    Color color = colorPicker.mousePressedHandling(event, view.getImageOfPane());
+                    view.setColorInColorChooser(color);
+                    changeColorOfTools(color);
+                    break;
+                case FLOOD_FILLER:
+                    node = floodFiller.mousePressedHandling(event, view.getImageOfPane());
+                    if (!view.isPaintPaneEmpty()) {
+                        view.removeAllNodePaintPane();
+                    }
+                    view.addNodeToPaintPane(node);
+                    updateUndoRedo();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void mouseDraggedHandling(MouseEvent event) {
+        if (null != currentTool) {
+            Node node;
+            switch (currentTool) {
+                case RECTANGLE:
+                    rectangleDrawer.mouseDraggedHandling(event);
+                    break;
+                case ROUNDED_RECTANGLE:
+                    roundedRectangleDrawer.mouseDraggedHandling(event);
+                    break;
+                case SQUARE_TRIANGLE:
+                    squareTriangleDrawer.mouseDraggedHandling(event);
+                    break;
+                case CURVE_LINE:
+                    curveLineDrawer.mouseDraggedHandling(event);
+                    break;
+                case PENCIL:
+                    node = pencil.mouseDraggedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case AIRBRUSH:
+                    double t = airbrush.getStrokeWidth() * 1.5;
+                    while (t-- > 0) {
+                        view.addNodeToPaintPane(airbrush.mouseDraggedHandling(event));
+                    }
+                    break;
+                case BRUSH:
+                    view.addNodeToPaintPane(brush.mouseDraggedHandling(event));
+                    break;
+                case CALLIGRAPHY_PEN:
+                    ArrayList<Line> list = calligraphyPen.mouseDraggedHandling(event);
+                    view.addNodeToPaintPane(list.toArray(new Line[list.size()]));
+                    break;
+                case COLOR_PICKER:
+                    Color color = colorPicker.mousePressedHandling(event, view.getImageOfPane());
+                    view.setColorInColorChooser(color);
+                    changeColorOfTools(color);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void mouseReleasedHandling(MouseEvent event) {
+        if (null != currentTool) {
+            switch (currentTool) {
+                case RECTANGLE:
+                    rectangleDrawer.mouseReleasedHandling(event);
+                    break;
+                case ROUNDED_RECTANGLE:
+                    roundedRectangleDrawer.mouseReleasedHandling(event);
+                    break;
+                case SQUARE_TRIANGLE:
+                    squareTriangleDrawer.mouseReleasedHandling(event);
+                    break;
+                case CURVE_LINE:
+                    curveLineDrawer.mouseReleasedHandling(event);
+                    break;
+                case AIRBRUSH:
+                    airbrush.mouseReleasedHandling(event);
+                    break;
+                case BRUSH:
+                    brush.mouseReleasedHandling(event);
+                    break;
+                case CALLIGRAPHY_PEN:
+                    calligraphyPen.mouseReleasedHandling(event);
+                    break;
+                default:
+                    break;
+            }
+            if (currentTool != ToolType.FLOOD_FILLER && currentTool != ToolType.COLOR_PICKER) {
+                updateUndoRedo();
+            }
+        }
     }
 
     private void keyboardActionHandler() {
@@ -326,84 +338,18 @@ public class Controller {
         });
     }
 
-    private void updateUndoRedo() {
-        undoStack.add(view.getImageOfPane());
-        redoStack.removeAllElements();
-    }
-
-    private void undoRedoActionHandler() {
-        combineKeyCtrlAndZ.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    if (!undoStack.isEmpty()) {
-                        redoStack.add(undoStack.pop());
-                    }
-                    view.removeAllNodePaintPane();
-                    if (!undoStack.isEmpty()) {
-                        view.setSizePaintPane(undoStack.peek().getWidth(), undoStack.peek().getHeight());
-                        view.addNodeToPaintPane(new ImageView(undoStack.peek()));
-                    }
-                }
-            }
-        });
-        combineKeyCtrlAndY.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    if (!redoStack.isEmpty()) {
-                        view.removeAllNodePaintPane();
-                        view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
-                        view.addNodeToPaintPane(new ImageView(redoStack.peek()));
-                        undoStack.add(redoStack.pop());
-                    }
-                }
-            }
-        });
-    }
-
-    private void copyAndPasteImage() {
-        combineKeyCtrlAndV.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    Image img = model.getImageFromClipboard();
-                    if (img != null) {
-                        ImageView imgView = new ImageView(img);
-                        if (view.isPaintPaneEmpty()) {
-                            // hỏi người dùng xem có muốn save không?
-                        }
-                        if (img.getHeight() > view.getPaintPaneHeight()) {
-                            view.setSizePaintPane(view.getPaintPaneWidth(), img.getHeight());
-                        }
-                        if (img.getWidth() > view.getPaintPaneWidth()) {
-                            view.setSizePaintPane(img.getWidth(), view.getPaintPaneHeight());
-                        }
-                        view.addNodeToPaintPane(imgView);
-                        updateUndoRedo();
-                    }
-                }
-            }
-        });
-    }
-
     private void sizeOfPenSliderAction() {
         view.addListenerInSlider(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                pencil.setSizeOfPen(newValue.doubleValue());
-                eraser.setSizeOfPen(newValue.doubleValue());
-                rectangleDrawer.setSizeOfPen(newValue.doubleValue());
-                curveLineDrawer.setSizeOfPen(newValue.doubleValue());
-                airbrush.setSizeOfPen(newValue.doubleValue());
-                brush.setSizeOfPen(newValue.doubleValue());
-                calligraphyPen.setSizeOfPen(newValue.doubleValue());
-                markerPen.setSizeOfPen(newValue.doubleValue());
-                ellipseDrawer.setSizeOfPen(newValue.doubleValue());
-                isoscelesTriangleDrawer.setSizeOfPen(newValue.doubleValue());
-                lineDrawer.setSizeOfPen(newValue.doubleValue());
-                roundedRectangleDrawer.setSizeOfPen(newValue.doubleValue());
-                squareTriangleDrawer.setSizeOfPen(newValue.doubleValue());
+                rectangleDrawer.setStrokeWidth(newValue.doubleValue());
+                roundedRectangleDrawer.setStrokeWidth(newValue.doubleValue());
+                squareTriangleDrawer.setStrokeWidth(newValue.doubleValue());
+                curveLineDrawer.setStrokeWidth(newValue.doubleValue());
+                pencil.setStrokeWidth(newValue.doubleValue());
+                airbrush.setStrokeWidth(newValue.doubleValue());
+                brush.setStrokeWidth(newValue.doubleValue());
+                calligraphyPen.setStrokeWidth(newValue.doubleValue());
             }
         });
     }
@@ -418,19 +364,15 @@ public class Controller {
     }
 
     private void changeColorOfTools(Color color) {
-        pencil.setColor(color);
-        floodFiller.setColor(color);
         rectangleDrawer.setColor(color);
+        roundedRectangleDrawer.setColor(color);
+        squareTriangleDrawer.setColor(color);
         curveLineDrawer.setColor(color);
+        pencil.setColor(color);
         airbrush.setColor(color);
         brush.setColor(color);
         calligraphyPen.setColor(color);
-        markerPen.setColor(color);
-        ellipseDrawer.setColor(color);
-        isoscelesTriangleDrawer.setColor(color);
-        lineDrawer.setColor(color);
-        roundedRectangleDrawer.setColor(color);
-        squareTriangleDrawer.setColor(color);
+        floodFiller.setColor(color);
     }
 
     private void toggleBtnGroupAction() {
@@ -438,55 +380,72 @@ public class Controller {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 if (newValue.getUserData() != null) {
-                    if (newValue.getUserData() != ToolType.CURVE_LINE) {
-                        curveLineDrawer.resetPressCount();
-                    }
                     switch ((ToolType) newValue.getUserData()) {
-                        case PENCIL:
-                            currentTool = ToolType.PENCIL;
-                            view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"));
-                            break;
-                        case ERASER:
-                            currentTool = ToolType.ERASER;
-                            break;
-                        case FLOOD_FILLER:
-                            currentTool = ToolType.FLOOD_FILLER;
-                            break;
                         case RECTANGLE:
                             currentTool = ToolType.RECTANGLE;
-                            break;
-                        case CURVE_LINE:
-                            currentTool = ToolType.CURVE_LINE;
-                            break;
-                        case AIRBRUSH:
-                            currentTool = ToolType.AIRBRUSH;
-                            break;
-                        case BRUSH:
-                            currentTool = ToolType.BRUSH;
-                            break;
-                        case CALLIGRAPHY_PEN:
-                            currentTool = ToolType.CALLIGRAPHY_PEN;
-                            break;
-                        case MARKER_PEN:
-                            currentTool = ToolType.MARKER_PEN;
-                            break;
-                        case ELLIPSE:
-                            currentTool = ToolType.ELLIPSE;
-                            break;
-                        case ISOSCELES_TRIANGLE:
-                            currentTool = ToolType.ISOSCELES_TRIANGLE;
-                            break;
-                        case LINE:
-                            currentTool = ToolType.LINE;
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
                             break;
                         case ROUNDED_RECTANGLE:
                             currentTool = ToolType.ROUNDED_RECTANGLE;
+                            rectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
                             break;
                         case SQUARE_TRIANGLE:
                             currentTool = ToolType.SQUARE_TRIANGLE;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            curveLineDrawer.setOff();
+                            break;
+                        case CURVE_LINE:
+                            currentTool = ToolType.CURVE_LINE;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            break;
+                        case PENCIL:
+                            currentTool = ToolType.PENCIL;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
+                            break;
+                        case AIRBRUSH:
+                            currentTool = ToolType.AIRBRUSH;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
+                            break;
+                        case BRUSH:
+                            currentTool = ToolType.BRUSH;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
+                            break;
+                        case CALLIGRAPHY_PEN:
+                            currentTool = ToolType.CALLIGRAPHY_PEN;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
                             break;
                         case COLOR_PICKER:
                             currentTool = ToolType.COLOR_PICKER;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
+                            break;
+                        case FLOOD_FILLER:
+                            currentTool = ToolType.FLOOD_FILLER;
+                            rectangleDrawer.setOff();
+                            roundedRectangleDrawer.setOff();
+                            squareTriangleDrawer.setOff();
+                            curveLineDrawer.setOff();
                             break;
                         default:
                             break;
@@ -494,6 +453,10 @@ public class Controller {
                 }
             }
         });
+    }
+
+    private boolean isWithinPaintPane(double x, double y) {
+        return !(x < 0 || y < 0 || x >= view.getPaintPaneWidth() || y >= view.getPaintPaneHeight());
     }
 
     private void saveWithKeyBoard() {
@@ -561,6 +524,67 @@ public class Controller {
                 if (event.isControlDown()) {
                     event.consume();
                     view.zoomPaintPane(event.getTextDeltaY(), new Point2D(event.getX(), event.getY()));
+                }
+            }
+        });
+    }
+
+    private void copyAndPasteImage() {
+        combineKeyCtrlAndV.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    Image img = model.getImageFromClipboard();
+                    if (img != null) {
+                        ImageView imgView = new ImageView(img);
+                        if (view.isPaintPaneEmpty()) {
+                            // hỏi người dùng xem có muốn save không?
+                        }
+                        if (img.getHeight() > view.getPaintPaneHeight()) {
+                            view.setSizePaintPane(view.getPaintPaneWidth(), img.getHeight());
+                        }
+                        if (img.getWidth() > view.getPaintPaneWidth()) {
+                            view.setSizePaintPane(img.getWidth(), view.getPaintPaneHeight());
+                        }
+                        view.addNodeToPaintPane(imgView);
+                        updateUndoRedo();
+                    }
+                }
+            }
+        });
+    }
+
+    private void updateUndoRedo() {
+        undoStack.add(view.getImageOfPane());
+        redoStack.removeAllElements();
+    }
+
+    private void undoRedoActionHandler() {
+        combineKeyCtrlAndZ.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    if (!undoStack.isEmpty()) {
+                        redoStack.add(undoStack.pop());
+                    }
+                    view.removeAllNodePaintPane();
+                    if (!undoStack.isEmpty()) {
+                        view.setSizePaintPane(undoStack.peek().getWidth(), undoStack.peek().getHeight());
+                        view.addNodeToPaintPane(new ImageView(undoStack.peek()));
+                    }
+                }
+            }
+        });
+        combineKeyCtrlAndY.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    if (!redoStack.isEmpty()) {
+                        view.removeAllNodePaintPane();
+                        view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
+                        view.addNodeToPaintPane(new ImageView(redoStack.peek()));
+                        undoStack.add(redoStack.pop());
+                    }
                 }
             }
         });

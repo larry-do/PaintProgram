@@ -5,11 +5,10 @@
  */
 package main.view;
 
-import drawer.PaintTool;
+import drawer.Tool.ToolType;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.RadioButton;
@@ -29,9 +28,9 @@ import javafx.scene.paint.Color;
 public class ToolBarView extends GridPane {
 
     private ToggleGroup toggleGroup;
-    private RadioButton pencilBtn, eraserBtn, floodFillerBtn, rectangleDrawerBtn, curveLineDrawerBtn;
-    private RadioButton airbrushBtn, colorPickerBtn, lineDrawerBtn;
-    private Button rotateBtn;
+    private RadioButton rectangleBtn, roundedRectangleBtn, squareTriangleBtn, curveLineBtn;
+    private RadioButton pencilBtn, airbrushBtn, brushBtn, calligraphyBtn;
+    private RadioButton colorPickerBtn, floodFillerBtn;
     private ColorPicker colorChooser;
     private Slider sizeOfPenSlider;
 
@@ -46,10 +45,62 @@ public class ToolBarView extends GridPane {
 
         toggleGroup = new ToggleGroup();
 
+        rectangleBtn = new RadioButton("rectangle");
+        rectangleBtn.setToggleGroup(toggleGroup);
+        rectangleBtn.setUserData(ToolType.RECTANGLE);
+        rectangleBtn.getStyleClass().remove("radio-button");
+        rectangleBtn.getStyleClass().add("toggle-button");
+        ImageView rectangleIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        rectangleIconView.setFitHeight(20);
+        rectangleIconView.setFitWidth(20);
+        rectangleBtn.setGraphic(rectangleIconView);
+        rectangleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        rectangleBtn.setTooltip(new Tooltip("Rectangle"));
+        add(rectangleBtn, 0, 0);
+
+        roundedRectangleBtn = new RadioButton("roundedRectangle");
+        roundedRectangleBtn.setToggleGroup(toggleGroup);
+        roundedRectangleBtn.setUserData(ToolType.ROUNDED_RECTANGLE);
+        roundedRectangleBtn.getStyleClass().remove("radio-button");
+        roundedRectangleBtn.getStyleClass().add("toggle-button");
+        ImageView roundedRectangleIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        roundedRectangleIconView.setFitHeight(20);
+        roundedRectangleIconView.setFitWidth(20);
+        roundedRectangleBtn.setGraphic(roundedRectangleIconView);
+        roundedRectangleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        roundedRectangleBtn.setTooltip(new Tooltip("Rounded Rectangle"));
+        add(roundedRectangleBtn, 1, 0);
+
+        squareTriangleBtn = new RadioButton("squareTriangle");
+        squareTriangleBtn.setToggleGroup(toggleGroup);
+        squareTriangleBtn.setUserData(ToolType.SQUARE_TRIANGLE);
+        squareTriangleBtn.getStyleClass().remove("radio-button");
+        squareTriangleBtn.getStyleClass().add("toggle-button");
+        ImageView squareTriangleIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        squareTriangleIconView.setFitHeight(20);
+        squareTriangleIconView.setFitWidth(20);
+        squareTriangleBtn.setGraphic(squareTriangleIconView);
+        squareTriangleBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        squareTriangleBtn.setTooltip(new Tooltip("Square Triangle"));
+        add(squareTriangleBtn, 0, 1);
+
+        curveLineBtn = new RadioButton("curveLine");
+        curveLineBtn.setToggleGroup(toggleGroup);
+        curveLineBtn.setUserData(ToolType.CURVE_LINE);
+        curveLineBtn.getStyleClass().remove("radio-button");
+        curveLineBtn.getStyleClass().add("toggle-button");
+        ImageView curveLineIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        curveLineIconView.setFitHeight(20);
+        curveLineIconView.setFitWidth(20);
+        curveLineBtn.setGraphic(curveLineIconView);
+        curveLineBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        curveLineBtn.setTooltip(new Tooltip("Curve Line"));
+        add(curveLineBtn, 1, 1);
+
         pencilBtn = new RadioButton("pencil");
-        pencilBtn.setSelected(true);
         pencilBtn.setToggleGroup(toggleGroup);
-        pencilBtn.setUserData(PaintTool.ToolType.PENCIL);
+        toggleGroup.selectToggle(pencilBtn);
+        pencilBtn.setUserData(ToolType.PENCIL);
         pencilBtn.getStyleClass().remove("radio-button");
         pencilBtn.getStyleClass().add("toggle-button");
         ImageView pencilIconView = new ImageView(new Image("icon/pencil-icon.png"));
@@ -58,37 +109,50 @@ public class ToolBarView extends GridPane {
         pencilBtn.setGraphic(pencilIconView);
         pencilBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         pencilBtn.setTooltip(new Tooltip("Pencil"));
-        add(pencilBtn, 0, 0);
+        add(pencilBtn, 0, 2);
 
-        eraserBtn = new RadioButton("eraser");
-        eraserBtn.setToggleGroup(toggleGroup);
-        eraserBtn.setUserData(PaintTool.ToolType.ERASER);
-        eraserBtn.getStyleClass().remove("radio-button");
-        eraserBtn.getStyleClass().add("toggle-button");
-        ImageView eraserIconView = new ImageView(new Image("icon/pencil-icon.png"));
-        eraserIconView.setFitHeight(20);
-        eraserIconView.setFitWidth(20);
-        eraserBtn.setGraphic(eraserIconView);
-        eraserBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        eraserBtn.setTooltip(new Tooltip("Eraser"));
-        add(eraserBtn, 1, 0);
+        airbrushBtn = new RadioButton("airbrush");
+        airbrushBtn.setToggleGroup(toggleGroup);
+        airbrushBtn.setUserData(ToolType.AIRBRUSH);
+        airbrushBtn.getStyleClass().remove("radio-button");
+        airbrushBtn.getStyleClass().add("toggle-button");
+        ImageView airbrushIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        airbrushIconView.setFitHeight(20);
+        airbrushIconView.setFitWidth(20);
+        airbrushBtn.setGraphic(airbrushIconView);
+        airbrushBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        airbrushBtn.setTooltip(new Tooltip("Airbrush"));
+        add(airbrushBtn, 1, 2);
 
-        floodFillerBtn = new RadioButton("floodFill");
-        floodFillerBtn.setToggleGroup(toggleGroup);
-        floodFillerBtn.setUserData(PaintTool.ToolType.FLOOD_FILLER);
-        floodFillerBtn.getStyleClass().remove("radio-button");
-        floodFillerBtn.getStyleClass().add("toggle-button");
-        ImageView floodFillerIconView = new ImageView(new Image("icon/pencil-icon.png"));
-        floodFillerIconView.setFitHeight(20);
-        floodFillerIconView.setFitWidth(20);
-        floodFillerBtn.setGraphic(floodFillerIconView);
-        floodFillerBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        floodFillerBtn.setTooltip(new Tooltip("Fill with color"));
-        add(floodFillerBtn, 0, 1);
+        brushBtn = new RadioButton("brush");
+        brushBtn.setToggleGroup(toggleGroup);
+        brushBtn.setUserData(ToolType.BRUSH);
+        brushBtn.getStyleClass().remove("radio-button");
+        brushBtn.getStyleClass().add("toggle-button");
+        ImageView brushIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        brushIconView.setFitHeight(20);
+        brushIconView.setFitWidth(20);
+        brushBtn.setGraphic(brushIconView);
+        brushBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        brushBtn.setTooltip(new Tooltip("Brush"));
+        add(brushBtn, 0, 3);
 
+        calligraphyBtn = new RadioButton("calligraphy");
+        calligraphyBtn.setToggleGroup(toggleGroup);
+        calligraphyBtn.setUserData(ToolType.CALLIGRAPHY_PEN);
+        calligraphyBtn.getStyleClass().remove("radio-button");
+        calligraphyBtn.getStyleClass().add("toggle-button");
+        ImageView calligraphyIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        calligraphyIconView.setFitHeight(20);
+        calligraphyIconView.setFitWidth(20);
+        calligraphyBtn.setGraphic(calligraphyIconView);
+        calligraphyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        calligraphyBtn.setTooltip(new Tooltip("Calligraphy Pen"));
+        add(calligraphyBtn, 1, 3);
+        
         colorPickerBtn = new RadioButton("colorPicker");
         colorPickerBtn.setToggleGroup(toggleGroup);
-        colorPickerBtn.setUserData(PaintTool.ToolType.COLOR_PICKER);
+        colorPickerBtn.setUserData(ToolType.COLOR_PICKER);
         colorPickerBtn.getStyleClass().remove("radio-button");
         colorPickerBtn.getStyleClass().add("toggle-button");
         ImageView colorPickerIconView = new ImageView(new Image("icon/pencil-icon.png"));
@@ -96,34 +160,21 @@ public class ToolBarView extends GridPane {
         colorPickerIconView.setFitWidth(20);
         colorPickerBtn.setGraphic(colorPickerIconView);
         colorPickerBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        colorPickerBtn.setTooltip(new Tooltip("Color Picker"));
-        add(colorPickerBtn, 1, 1);
-
-        lineDrawerBtn = new RadioButton("line");
-        lineDrawerBtn.setToggleGroup(toggleGroup);
-        lineDrawerBtn.setUserData(PaintTool.ToolType.LINE);
-        lineDrawerBtn.getStyleClass().remove("radio-button");
-        lineDrawerBtn.getStyleClass().add("toggle-button");
-        ImageView lineDrawerIconView = new ImageView(new Image("icon/pencil-icon.png"));
-        lineDrawerIconView.setFitHeight(20);
-        lineDrawerIconView.setFitWidth(20);
-        lineDrawerBtn.setGraphic(lineDrawerIconView);
-        lineDrawerBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        lineDrawerBtn.setTooltip(new Tooltip("Line"));
-        add(lineDrawerBtn, 0, 2);
-
-        curveLineDrawerBtn = new RadioButton("curveLine");
-        curveLineDrawerBtn.setToggleGroup(toggleGroup);
-        curveLineDrawerBtn.setUserData(PaintTool.ToolType.CURVE_LINE);
-        curveLineDrawerBtn.getStyleClass().remove("radio-button");
-        curveLineDrawerBtn.getStyleClass().add("toggle-button");
-        ImageView curveLineDrawerIconView = new ImageView(new Image("icon/pencil-icon.png"));
-        curveLineDrawerIconView.setFitHeight(20);
-        curveLineDrawerIconView.setFitWidth(20);
-        curveLineDrawerBtn.setGraphic(curveLineDrawerIconView);
-        curveLineDrawerBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        curveLineDrawerBtn.setTooltip(new Tooltip("Curve Line"));
-        add(curveLineDrawerBtn, 1, 2);
+        colorPickerBtn.setTooltip(new Tooltip("Color picker"));
+        add(colorPickerBtn, 0, 4);
+        
+        floodFillerBtn = new RadioButton("floodFiller");
+        floodFillerBtn.setToggleGroup(toggleGroup);
+        floodFillerBtn.setUserData(ToolType.FLOOD_FILLER);
+        floodFillerBtn.getStyleClass().remove("radio-button");
+        floodFillerBtn.getStyleClass().add("toggle-button");
+        ImageView floodFillerIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        floodFillerIconView.setFitHeight(20);
+        floodFillerIconView.setFitWidth(20);
+        floodFillerBtn.setGraphic(floodFillerIconView);
+        floodFillerBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        floodFillerBtn.setTooltip(new Tooltip("Flood Filler"));
+        add(floodFillerBtn, 1, 4);
 
         colorChooser = new ColorPicker(Color.BLACK);
         colorChooser.getStyleClass().add("button");
@@ -138,7 +189,7 @@ public class ToolBarView extends GridPane {
         add(colorChooser, 0, 5, 2, 1);
 
         sizeOfPenSlider = new Slider();
-        sizeOfPenSlider.setMax(30);
+        sizeOfPenSlider.setMax(15);
         sizeOfPenSlider.setMin(1);
         sizeOfPenSlider.setValue(1);
         Tooltip sizeTooltip = new Tooltip(Integer.toString((int) sizeOfPenSlider.getValue()));
@@ -149,7 +200,7 @@ public class ToolBarView extends GridPane {
                 sizeTooltip.setText(Integer.toString(newValue.intValue()));
             }
         });
-        add(sizeOfPenSlider, 0, 4, 2, 1);
+        add(sizeOfPenSlider, 0, 6, 2, 1);
     }
 
     public void addListenerInToggleGroup(ChangeListener<Toggle> listener) {

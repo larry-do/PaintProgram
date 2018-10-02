@@ -115,10 +115,6 @@ public class View {
 
     // các hàm liên quan đến Paint Pane
     //<editor-fold defaultstate="collapsed" desc="Paint Pane Funtion">
-    public Pane getPaintPane() {
-        return paintScrollPane.getPaintPane();
-    }
-
     public <T extends Event> void addZoomableScrollPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
         paintScrollPane.addZoomNodeEventHandler(eventType, eventHandler);
     }
@@ -131,7 +127,7 @@ public class View {
         paintScrollPane.setSizePaintPane(width, height);
     }
 
-    public <T extends Event> void addPaintPaneEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
+    public <T extends Event> void addEventHandlerIntoPaintPane(EventType<T> eventType, EventHandler<? super T> eventHandler) {
         paintScrollPane.addPaintPaneEventHandler(eventType, eventHandler);
     }
 
@@ -139,8 +135,8 @@ public class View {
         return paintScrollPane.getImageOfPane();
     }
 
-    public void addNodeToPaintPane(Node node) {
-        paintScrollPane.addNodeToPaintPane(node);
+    public void addNodeToPaintPane(Node... nodes) {
+        paintScrollPane.addNodeToPaintPane(nodes);
     }
 
     public void removeAllNodePaintPane() {
@@ -159,8 +155,8 @@ public class View {
         return paintScrollPane.getPaintPaneHeight();
     }
 
-    public void setImageOfCursorInPaintPane(Image img) {
-        paintScrollPane.setImageOfCursorInPaintPane(img);
+    public void setImageOfCursorInPaintPane(Image img, double x, double y) {
+        paintScrollPane.setImageOfCursorInPaintPane(img, x, y);
     }
     //</editor-fold>
 

@@ -5,37 +5,43 @@
  */
 package drawer.Pens;
 
-import drawer.PaintTool;
+import drawer.Tool;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeLineCap;
 
 /**
  *
  * @author Admin
  */
-public class Pencil extends PaintTool {
+public class Pencil extends PenTool implements Tool {
 
-    public Pencil(Pane panee) {
-        pane = panee;
+    private Line line;
+
+    public Pencil() {
+        super();
+        line = new Line(0, 0, 0, 0);
+        this.strokeLineCap = StrokeLineCap.SQUARE;
     }
 
-    public void mousePressedHandling(MouseEvent event) {
+    @Override
+    public Node mousePressedHandling(MouseEvent event) {
         anchorPoint = new Point2D(event.getX(), event.getY());
-        connectPoint(anchorPoint.getX(), anchorPoint.getY(), event.getX(), event.getY());
+        line = connectPoint(anchorPoint.getX(), anchorPoint.getY(), event.getX(), event.getY());
+        return line;
     }
 
-    public void mouseDraggedHandling(MouseEvent event) {
-        connectPoint(anchorPoint.getX(), anchorPoint.getY(), event.getX(), event.getY());
+    @Override
+    public Node mouseDraggedHandling(MouseEvent event) {
+        line = connectPoint(anchorPoint.getX(), anchorPoint.getY(), event.getX(), event.getY());
         anchorPoint = new Point2D(event.getX(), event.getY());
+        return line;
     }
 
-    private void connectPoint(double x0, double y0, double x1, double y1) {
-        shape = new Line(x0, y0, x1, y1);
-        shape.setStroke(color);
-        shape.setStrokeLineCap(strokeLineCap);
-        shape.setStrokeWidth(sizeOfPen);
-        pane.getChildren().add(shape);
+    @Override
+    public Node mouseReleasedHandling(MouseEvent event) {
+        return null;
     }
 }

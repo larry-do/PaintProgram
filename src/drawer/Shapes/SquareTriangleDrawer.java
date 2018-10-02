@@ -5,40 +5,73 @@
  */
 package drawer.Shapes;
 
-import drawer.PaintTool;
-import javafx.geometry.Point2D;
+import drawer.AreaPane;
+import drawer.AreaPane.HoverState;
+import drawer.Tool;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
+import javafx.scene.shape.*;
 
 /**
  *
  * @author Admin
  */
-public class SquareTriangleDrawer extends PaintTool {
+public class SquareTriangleDrawer extends ShapeDrawer implements Tool {
 
     private Polygon polygon;
 
-    public SquareTriangleDrawer(Pane pane) {
-        this.pane = pane;
-    }
-
-    public void mousePressedHandling(MouseEvent event) {
-        anchorPoint = new Point2D(event.getX(), event.getY());
+    public SquareTriangleDrawer() {
+        super();
         polygon = new Polygon(0, 0, 0, 0, 0, 0);
-        polygon.setStroke(color);
-        polygon.setStrokeWidth(sizeOfPen);
-        polygon.setFill(Color.TRANSPARENT);
-        pane.getChildren().add(polygon);
     }
 
-    public void mouseDraggedHandling(MouseEvent event) {
-        pane.getChildren().remove(polygon);
-        polygon = new Polygon(event.getX(), event.getY(), anchorPoint.getX(), anchorPoint.getY(), anchorPoint.getX(), event.getY());
-        polygon.setStroke(color);
-        polygon.setStrokeWidth(sizeOfPen);
+    @Override
+    public Node mousePressedHandling(MouseEvent event) {
+        if (areaPane.getHoverState() == HoverState.NULL) {
+            areaPane.setActiveState(false); // deactive old areaPane
+            areaPane = new AreaPane(event.getX(), event.getY());// create a new areaPane
+
+            polygon = new Polygon(0, 0, 0, 0, 0, 0);
+            polygon.setFill(Color.TRANSPARENT);
+            polygon.setStroke(color);
+            polygon.setStrokeWidth(strokeWidth);
+            polygon.setStrokeLineCap(strokeLineCap);
+
+            areaPane.getChildren().add(polygon);
+            areaPane.showBorder();
+            return areaPane;
+        } else {
+            areaPane.setMovingState(true);
+            areaPane.setAnchorPoint(event.getX(), event.getY());
+        }
+        return null;
+    }
+
+    @Override
+    public Node mouseDraggedHandling(MouseEvent event) {
+        if (!areaPane.getActiveState()) {
+            areaPane.dragToCreate(event.getX(), event.getY());
+        }
+        if (areaPane.getMovingState()) {
+            areaPane.dragToMoveAndResize(event.getX(), event.getY());
+        }
+        areaPane.getChildren().remove(polygon);
+        polygon = new Polygon(0, 0, 0, areaPane.getPrefHeight(), areaPane.getPrefWidth(), areaPane.getPrefHeight());
         polygon.setFill(Color.TRANSPARENT);
-        pane.getChildren().add(polygon);
+        polygon.setStroke(color);
+        polygon.setStrokeWidth(strokeWidth);
+        polygon.setStrokeLineCap(strokeLineCap);
+        areaPane.hideBoder();
+        areaPane.getChildren().add(polygon);
+        areaPane.showBorder();
+        return null;
+    }
+
+    @Override
+    public Node mouseReleasedHandling(MouseEvent event) {
+        areaPane.setActiveState(true);
+        areaPane.setMovingState(false);
+        return null;
     }
 }

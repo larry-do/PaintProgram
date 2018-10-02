@@ -5,10 +5,7 @@
  */
 package drawer;
 
-import javafx.geometry.Point2D;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
 import javafx.scene.shape.StrokeLineCap;
 
 /**
@@ -16,25 +13,23 @@ import javafx.scene.shape.StrokeLineCap;
  * @author Admin
  */
 public abstract class PaintTool {
-    
-    public enum ToolType {AIRBRUSH, BRUSH, CALLIGRAPHY_PEN, MARKER_PEN
-                        , PENCIL, CURVE_LINE, ELLIPSE, ISOSCELES_TRIANGLE
-                        , LINE, RECTANGLE, ROUNDED_RECTANGLE, SQUARE_TRIANGLE
-                        , ERASER, FLOOD_FILLER, TEXT, COLOR_PICKER, NULL};
 
-    protected Color color = Color.BLACK;
-    protected double sizeOfPen = 2;
-    protected StrokeLineCap strokeLineCap = StrokeLineCap.ROUND;
-    protected Point2D anchorPoint = new Point2D(0, 0), curPoint = new Point2D(0, 0);
-    protected Pane pane = null;
-    protected Shape shape = null;
+    protected Color color;
+    protected double strokeWidth;
+    protected StrokeLineCap strokeLineCap;
+
+    public PaintTool() {
+        color = Color.BLACK;
+        strokeWidth = 1;
+        strokeLineCap = StrokeLineCap.ROUND;
+    }
 
     public void setColor(Color color) {
         this.color = color;
     }
 
-    public void setSizeOfPen(double sizeOfPen) {
-        this.sizeOfPen = sizeOfPen;
+    public void setStrokeWidth(double strokeWidth) {
+        this.strokeWidth = strokeWidth;
     }
 
     public void setStrokeLineCap(StrokeLineCap strokeLineCap) {

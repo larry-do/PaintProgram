@@ -5,10 +5,10 @@
  */
 package drawer.Shapes;
 
-import drawer.PaintTool;
-import javafx.geometry.Point2D;
+import drawer.AreaPane;
+import drawer.Tool;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -16,48 +16,56 @@ import javafx.scene.shape.Rectangle;
  *
  * @author Admin
  */
-public class RoundedRectangleDrawer extends PaintTool {
+public class RoundedRectangleDrawer extends ShapeDrawer implements Tool {
 
-    private Rectangle rect;
+    private Rectangle rectangle;
 
-    public RoundedRectangleDrawer(Pane pane) {
-
-        this.pane = pane;
-
+    public RoundedRectangleDrawer() {
+        super();
+        rectangle = new Rectangle(0, 0, 0, 0);
     }
 
-    public void mousePressedHandling(MouseEvent event) {
-        anchorPoint = new Point2D(event.getX(), event.getY());
-        rect = new Rectangle(event.getX(), event.getY(), 0, 0);
-        rect.setFill(Color.TRANSPARENT);
-        rect.setStroke(color);
-        rect.setStrokeWidth(sizeOfPen);
-        rect.setArcHeight(30);
-        rect.setArcWidth(30);
-        pane.getChildren().add(rect);
-    }
+    @Override
+    public Node mousePressedHandling(MouseEvent event) {
+        if (areaPane.getHoverState() == AreaPane.HoverState.NULL) {
+            areaPane.setActiveState(false); // deactive old areaPane
+            areaPane = new AreaPane(event.getX(), event.getY());// create a new areaPane
 
-    public void mouseDraggedHandling(MouseEvent event) {
-        boolean x = event.getX() < anchorPoint.getX();
-        boolean y = event.getY() < anchorPoint.getY();
-        if (x == false && y == false) {
-            rect.setX(anchorPoint.getX());
-            rect.setY(anchorPoint.getY());
-            rect.setWidth(event.getX() - rect.getX());
-            rect.setHeight(event.getY() - rect.getY());
-        } else if (x == true && y == false) {
-            rect.setX(event.getX());
-            rect.setWidth(anchorPoint.getX() - rect.getX());
-            rect.setHeight(event.getY() - rect.getY());
-        } else if (x == false && y == true) {
-            rect.setY(event.getY());
-            rect.setWidth(event.getX() - rect.getX());
-            rect.setHeight(anchorPoint.getY() - rect.getY());
+            rectangle = new Rectangle(0, 0, 0, 0); // create a rectangle on the new areaPane
+            rectangle.setFill(Color.TRANSPARENT);
+            rectangle.setStroke(color);
+            rectangle.setStrokeWidth(strokeWidth);
+            rectangle.setStrokeLineCap(strokeLineCap);
+            rectangle.setArcWidth(30);
+            rectangle.setArcHeight(30);
+
+            areaPane.getChildren().add(rectangle); // add rectangle firstly
+            areaPane.showBorder();
+            return areaPane;
         } else {
-            rect.setX(event.getX());
-            rect.setY(event.getY());
-            rect.setWidth(anchorPoint.getX() - rect.getX());
-            rect.setHeight(anchorPoint.getY() - rect.getY());
+            areaPane.setMovingState(true);
+            areaPane.setAnchorPoint(event.getX(), event.getY());
         }
+        return null;
+    }
+
+    @Override
+    public Node mouseDraggedHandling(MouseEvent event) {
+        if (!areaPane.getActiveState()) {
+            areaPane.dragToCreate(event.getX(), event.getY());
+        }
+        if (areaPane.getMovingState()) {
+            areaPane.dragToMoveAndResize(event.getX(), event.getY());
+        }
+        rectangle.setWidth(areaPane.getPrefWidth());
+        rectangle.setHeight(areaPane.getPrefHeight());
+        return null;
+    }
+    
+    @Override
+    public Node mouseReleasedHandling(MouseEvent event){
+        areaPane.setActiveState(true);
+        areaPane.setMovingState(false);
+        return null;
     }
 }

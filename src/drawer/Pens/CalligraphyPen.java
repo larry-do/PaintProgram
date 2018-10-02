@@ -1,36 +1,40 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package drawer.Pens;
 
-import drawer.PaintTool;
+import java.util.ArrayList;
+import java.util.Collection;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeLineCap;
 
-/**
- *
- * @author Admin
- */
-public class CalligraphyPen extends PaintTool {
+public class CalligraphyPen extends PenTool {
 
-    public CalligraphyPen(Pane pane) {
-        this.pane = pane;
+    private ArrayList<Line> list;
+
+    public CalligraphyPen() {
+        super();
+        strokeLineCap = StrokeLineCap.SQUARE;
+        list = new ArrayList<>();
     }
 
-    public void mousePressedHandling(MouseEvent event) {
+    public ArrayList<Line> mousePressedHandling(MouseEvent event) {
+        list.removeAll((Collection<?>) list.clone());
         anchorPoint = new Point2D(event.getX(), event.getY());
         curPoint = new Point2D(event.getX(), event.getY());
-        strokeLineUsingBresehamAlgorithm(anchorPoint.getX(), anchorPoint.getY(), curPoint.getX(), curPoint.getY());
+        strokeLineUsingBresehamAlgorithm(curPoint.getX(), curPoint.getY(), anchorPoint.getX(), anchorPoint.getY());
+        return list;
     }
 
-    public void mouseDraggedHandling(MouseEvent event) {
+    public ArrayList<Line> mouseDraggedHandling(MouseEvent event) {
+        list.removeAll((Collection<?>) list.clone());
         curPoint = new Point2D(event.getX(), event.getY());
-        strokeLineUsingBresehamAlgorithm(anchorPoint.getX(), anchorPoint.getY(), curPoint.getX(), curPoint.getY());
+        strokeLineUsingBresehamAlgorithm(curPoint.getX(), curPoint.getY(), anchorPoint.getX(), anchorPoint.getY());
         anchorPoint = new Point2D(curPoint.getX(), curPoint.getY());
+        return list;
+    }
+
+    public void mouseReleasedHandling(MouseEvent event) {
+        list.removeAll((Collection<?>) list.clone());
     }
 
     private void strokeLineUsingBresehamAlgorithm(double x, double y, double x0, double y0) {
@@ -40,10 +44,8 @@ public class CalligraphyPen extends PaintTool {
         double err = delta_x + delta_y;
         double e2;
         while (true) {
-
-            connectPoint(x - (sizeOfPen / 2), y - (sizeOfPen / 2), x + (sizeOfPen / 2), y + (sizeOfPen / 2));
-            connectPoint(x - (sizeOfPen / 2) - 1, y - (sizeOfPen / 2), x + (sizeOfPen / 2), y + (sizeOfPen / 2) + 1);
-
+            list.add(connectPoint(x - (strokeWidth / 2), y - (strokeWidth / 2), x + (strokeWidth / 2), y + (strokeWidth / 2)));
+            list.add(connectPoint(x - (strokeWidth / 2) - 1, y - (strokeWidth / 2), x + (strokeWidth / 2), y + (strokeWidth / 2) + 1));
             if (x == x0 && y == y0) {
                 break;
             }
@@ -59,11 +61,11 @@ public class CalligraphyPen extends PaintTool {
         }
     }
 
-    private void connectPoint(double x0, double y0, double x1, double y1) {
-        shape = new Line(x0, y0, x1, y1);
-        shape.setStroke(color);
-        shape.setStrokeLineCap(strokeLineCap);
-        pane.getChildren().add(shape);
+    @Override
+    protected Line connectPoint(double x0, double y0, double x1, double y1) {
+        Line line = new Line(x0, y0, x1, y1);
+        line.setStroke(color);
+        line.setStrokeLineCap(strokeLineCap);
+        return line;
     }
-
 }

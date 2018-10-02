@@ -32,7 +32,7 @@ public class PaintArea extends ZoomableScrollPane {
         paintPane = new Pane();
         paintPane.setStyle("-fx-background-color: white");
         paintPane.setPrefSize(DEFAULT_PAINT_WIDTH, DEFAULT_PAINT_HEIGHT);
-        setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"));
+        setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 0);
 
         setTargetNode(paintPane);
         setPannable(false);
@@ -60,8 +60,8 @@ public class PaintArea extends ZoomableScrollPane {
         return image;
     }
 
-    public void addNodeToPaintPane(Node node) {
-        paintPane.getChildren().add(node);
+    public void addNodeToPaintPane(Node... nodes) {
+        paintPane.getChildren().addAll(nodes);
     }
 
     public void removeAllNodePaintPane() {
@@ -80,7 +80,7 @@ public class PaintArea extends ZoomableScrollPane {
         return paintPane.getPrefHeight();
     }
 
-    public void setImageOfCursorInPaintPane(Image img) {
-        paintPane.setCursor(new ImageCursor(img));
+    public void setImageOfCursorInPaintPane(Image img, double x, double y) {
+        paintPane.setCursor(new ImageCursor(img, x, y));
     }
 }

@@ -1,8 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* To change this license header, choose License Headers in Project Properties.
+* To change this template file, choose Tools | Templates
+* and open the template in the editor.
+*/
+
+/*
 package drawer.Shapes;
 
 import drawer.PaintTool;
@@ -12,18 +14,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 
-/**
- *
- * @author Admin
- */
 public class EllipseDrawer extends PaintTool {
-
+    
     private Ellipse ellipse;
-
+    
     public EllipseDrawer(Pane pane) {
         this.pane = pane;
     }
-
+    
     public void mousePressedHandling(MouseEvent event) {
         anchorPoint = new Point2D(event.getX(), event.getY());
         ellipse = new Ellipse(event.getX(), event.getY(), 0, 0);
@@ -32,7 +30,7 @@ public class EllipseDrawer extends PaintTool {
         ellipse.setFill(Color.TRANSPARENT);
         pane.getChildren().add(ellipse);
     }
-
+    
     public void mouseDraggedHandling(MouseEvent event) {
         boolean x = event.getX() < anchorPoint.getX();
         boolean y = event.getY() < anchorPoint.getY();
@@ -58,4 +56,4 @@ public class EllipseDrawer extends PaintTool {
             ellipse.setRadiusY(anchorPoint.getY() - ellipse.getCenterY());
         }
     }
-}
+}*/
