@@ -81,6 +81,7 @@ public class PaintArea extends ZoomableScrollPane {
     }
 
     public void setImageOfCursorInPaintPane(Image img, double x, double y) {
-        paintPane.setCursor(new ImageCursor(img, x, y));
+        ImageCursor cursor = new ImageCursor(img, x, y);
+        paintPane.setCursor(cursor);
     }
 }

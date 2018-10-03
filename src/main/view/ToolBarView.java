@@ -50,7 +50,7 @@ public class ToolBarView extends GridPane {
         rectangleBtn.setUserData(ToolType.RECTANGLE);
         rectangleBtn.getStyleClass().remove("radio-button");
         rectangleBtn.getStyleClass().add("toggle-button");
-        ImageView rectangleIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView rectangleIconView = new ImageView(new Image("icon/rectangle-icon.png"));
         rectangleIconView.setFitHeight(20);
         rectangleIconView.setFitWidth(20);
         rectangleBtn.setGraphic(rectangleIconView);
@@ -63,7 +63,7 @@ public class ToolBarView extends GridPane {
         roundedRectangleBtn.setUserData(ToolType.ROUNDED_RECTANGLE);
         roundedRectangleBtn.getStyleClass().remove("radio-button");
         roundedRectangleBtn.getStyleClass().add("toggle-button");
-        ImageView roundedRectangleIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView roundedRectangleIconView = new ImageView(new Image("icon/roundedRectangle-icon.png"));
         roundedRectangleIconView.setFitHeight(20);
         roundedRectangleIconView.setFitWidth(20);
         roundedRectangleBtn.setGraphic(roundedRectangleIconView);
@@ -76,7 +76,7 @@ public class ToolBarView extends GridPane {
         squareTriangleBtn.setUserData(ToolType.SQUARE_TRIANGLE);
         squareTriangleBtn.getStyleClass().remove("radio-button");
         squareTriangleBtn.getStyleClass().add("toggle-button");
-        ImageView squareTriangleIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView squareTriangleIconView = new ImageView(new Image("icon/squareTriangle-icon.png"));
         squareTriangleIconView.setFitHeight(20);
         squareTriangleIconView.setFitWidth(20);
         squareTriangleBtn.setGraphic(squareTriangleIconView);
@@ -89,7 +89,7 @@ public class ToolBarView extends GridPane {
         curveLineBtn.setUserData(ToolType.CURVE_LINE);
         curveLineBtn.getStyleClass().remove("radio-button");
         curveLineBtn.getStyleClass().add("toggle-button");
-        ImageView curveLineIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView curveLineIconView = new ImageView(new Image("icon/curveLine-icon.png"));
         curveLineIconView.setFitHeight(20);
         curveLineIconView.setFitWidth(20);
         curveLineBtn.setGraphic(curveLineIconView);
@@ -116,7 +116,7 @@ public class ToolBarView extends GridPane {
         airbrushBtn.setUserData(ToolType.AIRBRUSH);
         airbrushBtn.getStyleClass().remove("radio-button");
         airbrushBtn.getStyleClass().add("toggle-button");
-        ImageView airbrushIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView airbrushIconView = new ImageView(new Image("icon/airbrush-icon.png"));
         airbrushIconView.setFitHeight(20);
         airbrushIconView.setFitWidth(20);
         airbrushBtn.setGraphic(airbrushIconView);
@@ -129,7 +129,7 @@ public class ToolBarView extends GridPane {
         brushBtn.setUserData(ToolType.BRUSH);
         brushBtn.getStyleClass().remove("radio-button");
         brushBtn.getStyleClass().add("toggle-button");
-        ImageView brushIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView brushIconView = new ImageView(new Image("icon/brush-icon.png"));
         brushIconView.setFitHeight(20);
         brushIconView.setFitWidth(20);
         brushBtn.setGraphic(brushIconView);
@@ -142,7 +142,7 @@ public class ToolBarView extends GridPane {
         calligraphyBtn.setUserData(ToolType.CALLIGRAPHY_PEN);
         calligraphyBtn.getStyleClass().remove("radio-button");
         calligraphyBtn.getStyleClass().add("toggle-button");
-        ImageView calligraphyIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView calligraphyIconView = new ImageView(new Image("icon/calligraphyPen-icon.png"));
         calligraphyIconView.setFitHeight(20);
         calligraphyIconView.setFitWidth(20);
         calligraphyBtn.setGraphic(calligraphyIconView);
@@ -155,7 +155,7 @@ public class ToolBarView extends GridPane {
         colorPickerBtn.setUserData(ToolType.COLOR_PICKER);
         colorPickerBtn.getStyleClass().remove("radio-button");
         colorPickerBtn.getStyleClass().add("toggle-button");
-        ImageView colorPickerIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView colorPickerIconView = new ImageView(new Image("icon/colorPicker-icon.png"));
         colorPickerIconView.setFitHeight(20);
         colorPickerIconView.setFitWidth(20);
         colorPickerBtn.setGraphic(colorPickerIconView);
@@ -168,7 +168,7 @@ public class ToolBarView extends GridPane {
         floodFillerBtn.setUserData(ToolType.FLOOD_FILLER);
         floodFillerBtn.getStyleClass().remove("radio-button");
         floodFillerBtn.getStyleClass().add("toggle-button");
-        ImageView floodFillerIconView = new ImageView(new Image("icon/pencil-icon.png"));
+        ImageView floodFillerIconView = new ImageView(new Image("icon/floodFiller-icon.png"));
         floodFillerIconView.setFitHeight(20);
         floodFillerIconView.setFitWidth(20);
         floodFillerBtn.setGraphic(floodFillerIconView);

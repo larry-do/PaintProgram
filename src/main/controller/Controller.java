@@ -386,24 +386,28 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                             break;
                         case ROUNDED_RECTANGLE:
                             currentTool = ToolType.ROUNDED_RECTANGLE;
                             rectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                             break;
                         case SQUARE_TRIANGLE:
                             currentTool = ToolType.SQUARE_TRIANGLE;
                             rectangleDrawer.setOff();
                             roundedRectangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                             break;
                         case CURVE_LINE:
                             currentTool = ToolType.CURVE_LINE;
                             rectangleDrawer.setOff();
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                             break;
                         case PENCIL:
                             currentTool = ToolType.PENCIL;
@@ -411,6 +415,7 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 0);
                             break;
                         case AIRBRUSH:
                             currentTool = ToolType.AIRBRUSH;
@@ -418,6 +423,7 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/airbrush-cursor.png"), 0, 150);
                             break;
                         case BRUSH:
                             currentTool = ToolType.BRUSH;
@@ -425,6 +431,7 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/brush-cursor.png"), 30, 30);
                             break;
                         case CALLIGRAPHY_PEN:
                             currentTool = ToolType.CALLIGRAPHY_PEN;
@@ -432,6 +439,7 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/calligraphyPen-cursor.png"), 20, 180);
                             break;
                         case COLOR_PICKER:
                             currentTool = ToolType.COLOR_PICKER;
@@ -439,6 +447,7 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/colorPicker-cursor.png"), 30, 30);
                             break;
                         case FLOOD_FILLER:
                             currentTool = ToolType.FLOOD_FILLER;
@@ -446,6 +455,7 @@ public class Controller {
                             roundedRectangleDrawer.setOff();
                             squareTriangleDrawer.setOff();
                             curveLineDrawer.setOff();
+                            view.setImageOfCursorInPaintPane(new Image("icon/floodFiller-cursor.png"), 0, 150);
                             break;
                         default:
                             break;
