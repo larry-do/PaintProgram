@@ -29,7 +29,7 @@ public class Pencil extends PenTool implements Tool {
     @Override
     public Node mousePressedHandling(MouseEvent event) {
         anchorPoint = new Point2D(event.getX(), event.getY());
-        line = connectPoint(anchorPoint.getX(), anchorPoint.getY(), event.getX(), event.getY());
+        line = connectPoint(event.getX(), event.getY(), event.getX(), event.getY());
         return line;
     }
 

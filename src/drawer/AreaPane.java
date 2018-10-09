@@ -59,7 +59,6 @@ public class AreaPane extends Pane {
     private HoverState state;
 
     public AreaPane(double x, double y) {
-        //<editor-fold defaultstate="collapsed" desc="GUI">
         super();
         setLayoutX(x);
         setLayoutY(y);
@@ -95,7 +94,7 @@ public class AreaPane extends Pane {
         dotBL.setPosition(dotBL.WIDTH / 2, getPrefHeight() - dotBL.HEIGHT / 2);
         dotML = new ResizeDot();
         dotML.setPosition(dotML.WIDTH / 2, getPrefHeight() / 2);
-        //</editor-fold>
+
         hoverEventHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -240,15 +239,14 @@ public class AreaPane extends Pane {
     public void showBorder() {
         getChildren().addAll(borderRect2, borderRect1, dotUL, dotUM, dotUR, dotMR, dotBR, dotBM, dotBL, dotML);
     }
-    
-    public void hideBoder(){
+
+    public void hideBoder() {
         getChildren().removeAll(borderRect2, borderRect1, dotUL, dotUM, dotUR, dotMR, dotBR, dotBM, dotBL, dotML);
     }
 
     public void setMovingState(boolean state) {
         canMove = state;
         if (state) {
-            removeEventFilter(MouseEvent.ANY, hoverEventHandler);
             setCursorHoveringImage(getHoverState());
         } else {
             addEventFilter(MouseEvent.ANY, hoverEventHandler);
@@ -388,4 +386,16 @@ public class AreaPane extends Pane {
         return HoverState.NULL;
     }
 
+    public void setBorderVisiable(boolean state) {
+        borderRect2.setVisible(state);
+        borderRect1.setVisible(state);
+        dotUL.setVisible(state);
+        dotUM.setVisible(state);
+        dotUR.setVisible(state);
+        dotMR.setVisible(state);
+        dotBR.setVisible(state);
+        dotBM.setVisible(state);
+        dotBL.setVisible(state);
+        dotML.setVisible(state);
+    }
 }

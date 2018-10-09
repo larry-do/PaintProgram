@@ -7,9 +7,6 @@ package drawer.Shapes;
 
 import drawer.AreaPane;
 import drawer.PaintTool;
-import drawer.Tool;
-import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
 
@@ -17,18 +14,22 @@ import javafx.scene.shape.StrokeLineCap;
  *
  * @author Admin
  */
-public abstract class ShapeDrawer extends PaintTool{
-
+public abstract class ShapeDrawer extends PaintTool {
+    
     protected AreaPane areaPane;
-
+    
     public ShapeDrawer() {
         color = Color.BLACK;
         strokeWidth = 1;
         strokeLineCap = StrokeLineCap.ROUND;
         areaPane = new AreaPane(0, 0);
     }
-
-    public void setOff() {
-        areaPane.setActiveState(false);
+    
+    public void setActiveState(boolean state) {
+        areaPane.setActiveState(state);
+    }
+    
+    public void setBorderVisiable(boolean state) {
+        areaPane.setBorderVisiable(state);
     }
 }

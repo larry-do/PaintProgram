@@ -5,13 +5,16 @@
  */
 package main.model;
 
+import drawer.AreaPane;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javax.imageio.ImageIO;
 
@@ -29,8 +32,16 @@ public class Model {
 
     }
 
-    public void writeImage(Image image) {
+    public void writeImageToFile(Image image) {
         RenderedImage renderedImage = SwingFXUtils.fromFXImage(image, null);
+        try {
+            ImageIO.write(renderedImage, "png", file);
+        } catch (IOException ex) {
+            System.out.println("Lỗi không ghi được file");
+        }
+    }
+
+    public void saveAs(Image image) {
         fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.png", "*.png"));
         fileChooser.setInitialFileName("Untitled");
@@ -39,16 +50,12 @@ public class Model {
         fileChooser.setInitialDirectory(new File(path));
         file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            try {
-                ImageIO.write(renderedImage, "png", file);
-            } catch (IOException ex) {
-                System.out.println("Lỗi không ghi được file");
-            }
+            writeImageToFile(image);
         }
     }
 
     public Image getImageFromFile() {
-        Image img = null;
+        Image image = null;
         fileChooser = new FileChooser();
         String path = System.getProperty("user.home") + "\\Desktop";
         fileChooser.setInitialDirectory(new File(path));
@@ -56,17 +63,26 @@ public class Model {
                 "*.bmp", "*.jfif", "*.gif"));
         file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            img = new Image(file.toURI().toString());
+            image = new Image(file.toURI().toString());
         }
-        return img;
+        return image;
     }
 
     public Image getImageFromClipboard() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
-        if(clipboard.hasFiles()){
+        if (clipboard.hasFiles()) {
             List<File> filesList = clipboard.getFiles();
             return new Image(filesList.get(filesList.size() - 1).toURI().toString());
         }
         return null;
+    }
+
+    public boolean isFileEmpty() {
+        return (file == null);
+    }
+
+    public void resetModel() {
+        fileChooser = null;
+        file = null;
     }
 }

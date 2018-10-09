@@ -81,6 +81,10 @@ public class View {
         //</editor-fold>
     }
 
+    public void newMenuAction(EventHandler<ActionEvent> eventHandler) {
+        menuBarView.addEventHandlerInNewMenuItem(eventHandler);
+    }
+
     public void openImageFromOutside(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInOpenMenuItem(eventHandler);
     }
