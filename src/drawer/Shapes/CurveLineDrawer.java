@@ -157,8 +157,8 @@ public class CurveLineDrawer extends ShapeDrawer implements Tool {
     }
 
     @Override
-    public void setOff() {
+    public void setActiveState(boolean state) {
         pressCount = 0;
-        areaPane.setActiveState(false);
+        areaPane.setActiveState(state);
     }
 }

@@ -18,17 +18,17 @@ public class CalligraphyPen extends PenTool {
     }
 
     public ArrayList<Line> mousePressedHandling(MouseEvent event) {
-        list.removeAll((Collection<?>) list.clone());
+        list = new ArrayList<>();
         anchorPoint = new Point2D(event.getX(), event.getY());
         curPoint = new Point2D(event.getX(), event.getY());
-        strokeLineUsingBresehamAlgorithm(curPoint.getX(), curPoint.getY(), anchorPoint.getX(), anchorPoint.getY());
+        strokeLineUsingBresehamAlgorithm((int)curPoint.getX(), (int)curPoint.getY(), (int)anchorPoint.getX(), (int)anchorPoint.getY());
         return list;
     }
 
     public ArrayList<Line> mouseDraggedHandling(MouseEvent event) {
-        list.removeAll((Collection<?>) list.clone());
+        list = new ArrayList<>();
         curPoint = new Point2D(event.getX(), event.getY());
-        strokeLineUsingBresehamAlgorithm(curPoint.getX(), curPoint.getY(), anchorPoint.getX(), anchorPoint.getY());
+        strokeLineUsingBresehamAlgorithm((int)curPoint.getX(), (int)curPoint.getY(), (int)anchorPoint.getX(), (int)anchorPoint.getY());
         anchorPoint = new Point2D(curPoint.getX(), curPoint.getY());
         return list;
     }
@@ -37,7 +37,7 @@ public class CalligraphyPen extends PenTool {
         list.removeAll((Collection<?>) list.clone());
     }
 
-    private void strokeLineUsingBresehamAlgorithm(double x, double y, double x0, double y0) {
+    private void strokeLineUsingBresehamAlgorithm(int x, int y, int x0, int y0) {
         double delta_x = Math.abs(x0 - x), delta_y = -Math.abs(y0 - y);
         double sx = (x < x0) ? 1 : -1;
         double sy = (y < y0) ? 1 : -1;
