@@ -32,7 +32,6 @@ public class PaintArea extends ZoomableScrollPane {
         paintPane = new Pane();
         paintPane.setStyle("-fx-background-color: white");
         paintPane.setPrefSize(DEFAULT_PAINT_WIDTH, DEFAULT_PAINT_HEIGHT);
-        setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 0);
 
         setTargetNode(paintPane);
         setPannable(false);

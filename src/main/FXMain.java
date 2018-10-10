@@ -6,6 +6,7 @@
 package main;
 
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import main.controller.Controller;
 import main.model.Model;
@@ -37,6 +38,7 @@ public class FXMain extends Application {
         primaryStage.setTitle("Paint");
         primaryStage.setScene(view.getScene());
         primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("icon/app-icon.png"));
         primaryStage.show();
     }
 

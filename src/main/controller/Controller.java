@@ -97,7 +97,7 @@ public class Controller {
         redoStack = new Stack<>();
 
         // set default tool
-        currentTool = ToolType.PENCIL;
+        setTool(ToolType.PENCIL);
 
         mouseActionHandler();
         keyboardActionHandler();
@@ -115,6 +115,7 @@ public class Controller {
         saveMenuAction();
     }
 
+    //<editor-fold defaultstate="collapsed" desc="Các thao tác với chuột">
     private void mouseActionHandler() {
         view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
@@ -123,7 +124,7 @@ public class Controller {
                     mousePressedHandling(event);
                 }
             }
-
+            
         });
         view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
             @Override
@@ -132,17 +133,17 @@ public class Controller {
                     mouseDraggedHandling(event);
                 }
             }
-
+            
         });
         view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 mouseReleasedHandling(event);
             }
-
+            
         });
     }
-
+    
     private void mousePressedHandling(MouseEvent event) {
         if (null != currentTool) {
             Node node;
@@ -206,8 +207,7 @@ public class Controller {
                 case IMAGE_INSERTION:
                     imageInsertion.mousePressedHandling(event);
                     if (!imageInsertion.getActiveState()) {
-                        imageInsertion.setActiveState(false);
-                        currentTool = ToolType.PENCIL;
+                        setTool(ToolType.PENCIL);
                         pencil.mousePressedHandling(event);
                     }
                     break;
@@ -216,7 +216,7 @@ public class Controller {
             }
         }
     }
-
+    
     private void mouseDraggedHandling(MouseEvent event) {
         if (null != currentTool) {
             Node node;
@@ -265,7 +265,7 @@ public class Controller {
             }
         }
     }
-
+    
     private void mouseReleasedHandling(MouseEvent event) {
         if (null != currentTool) {
             switch (currentTool) {
@@ -308,7 +308,8 @@ public class Controller {
             }
         }
     }
-
+    //</editor-fold>
+    
     private void keyboardActionHandler() {
         view.addEventHandlerInScene(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
@@ -408,99 +409,110 @@ public class Controller {
             @Override
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 if (newValue.getUserData() != null) {
-                    switch ((ToolType) newValue.getUserData()) {
-                        case RECTANGLE:
-                            currentTool = ToolType.RECTANGLE;
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
-                            break;
-                        case ROUNDED_RECTANGLE:
-                            currentTool = ToolType.ROUNDED_RECTANGLE;
-                            rectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
-                            break;
-                        case SQUARE_TRIANGLE:
-                            currentTool = ToolType.SQUARE_TRIANGLE;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
-                            break;
-                        case CURVE_LINE:
-                            currentTool = ToolType.CURVE_LINE;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
-                            break;
-                        case PENCIL:
-                            currentTool = ToolType.PENCIL;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 0);
-                            break;
-                        case AIRBRUSH:
-                            currentTool = ToolType.AIRBRUSH;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/airbrush-cursor.png"), 0, 150);
-                            break;
-                        case BRUSH:
-                            currentTool = ToolType.BRUSH;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/brush-cursor.png"), 30, 30);
-                            break;
-                        case CALLIGRAPHY_PEN:
-                            currentTool = ToolType.CALLIGRAPHY_PEN;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/calligraphyPen-cursor.png"), 20, 180);
-                            break;
-                        case COLOR_PICKER:
-                            currentTool = ToolType.COLOR_PICKER;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/colorPicker-cursor.png"), 30, 30);
-                            break;
-                        case FLOOD_FILLER:
-                            currentTool = ToolType.FLOOD_FILLER;
-                            rectangleDrawer.setActiveState(false);
-                            roundedRectangleDrawer.setActiveState(false);
-                            squareTriangleDrawer.setActiveState(false);
-                            curveLineDrawer.setActiveState(false);
-                            imageInsertion.setActiveState(false);
-                            view.setImageOfCursorInPaintPane(new Image("icon/floodFiller-cursor.png"), 0, 150);
-                            break;
-                        default:
-                            break;
-                    }
+                    setTool((ToolType) newValue.getUserData());
                 }
             }
         });
+    }
+
+    private void setTool(ToolType type) {
+        switch (type) {
+            case RECTANGLE:
+                currentTool = ToolType.RECTANGLE;
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                break;
+            case ROUNDED_RECTANGLE:
+                currentTool = ToolType.ROUNDED_RECTANGLE;
+                rectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                break;
+            case SQUARE_TRIANGLE:
+                currentTool = ToolType.SQUARE_TRIANGLE;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                break;
+            case CURVE_LINE:
+                currentTool = ToolType.CURVE_LINE;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                break;
+            case PENCIL:
+                currentTool = ToolType.PENCIL;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 200);
+                break;
+            case AIRBRUSH:
+                currentTool = ToolType.AIRBRUSH;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/airbrush-cursor.png"), 180, 30);
+                break;
+            case BRUSH:
+                currentTool = ToolType.BRUSH;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/brush-cursor.png"), 30, 30);
+                break;
+            case CALLIGRAPHY_PEN:
+                currentTool = ToolType.CALLIGRAPHY_PEN;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/calligraphyPen-cursor.png"), 0, 200);
+                break;
+            case COLOR_PICKER:
+                currentTool = ToolType.COLOR_PICKER;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/colorPicker-cursor.png"), 0, 200);
+                break;
+            case FLOOD_FILLER:
+                currentTool = ToolType.FLOOD_FILLER;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                imageInsertion.setActiveState(false);
+                view.setImageOfCursorInPaintPane(new Image("icon/floodFiller-cursor.png"), 200, 200);
+                break;
+            case IMAGE_INSERTION:
+                currentTool = ToolType.IMAGE_INSERTION;
+                rectangleDrawer.setActiveState(false);
+                roundedRectangleDrawer.setActiveState(false);
+                squareTriangleDrawer.setActiveState(false);
+                curveLineDrawer.setActiveState(false);
+                break;
+            default:
+                break;
+        }
     }
 
     private boolean isWithinPaintPane(double x, double y) {
@@ -568,11 +580,7 @@ public class Controller {
                     view.setSizePaintPane(imageInsertion.getPrefWidth(), imageInsertion.getPrefHeight());
                     view.addNodeToPaintPane(imageInsertion);
                     updateUndoRedo();
-                    currentTool = ToolType.IMAGE_INSERTION;
-                    rectangleDrawer.setActiveState(false);
-                    roundedRectangleDrawer.setActiveState(false);
-                    squareTriangleDrawer.setActiveState(false);
-                    curveLineDrawer.setActiveState(false);
+                    setTool(ToolType.IMAGE_INSERTION);
                 }
             }
         });
@@ -609,11 +617,7 @@ public class Controller {
                         }
                         view.addNodeToPaintPane(imageInsertion);
                         updateUndoRedo();
-                        currentTool = ToolType.IMAGE_INSERTION;
-                        rectangleDrawer.setActiveState(false);
-                        roundedRectangleDrawer.setActiveState(false);
-                        squareTriangleDrawer.setActiveState(false);
-                        curveLineDrawer.setActiveState(false);
+                        setTool(ToolType.IMAGE_INSERTION);
                     }
                 }
             }
