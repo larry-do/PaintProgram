@@ -12,6 +12,7 @@ import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 
@@ -57,6 +58,13 @@ public class PaintArea extends ZoomableScrollPane {
         WritableImage image = new WritableImage((int) paintPane.getPrefWidth(), (int) paintPane.getPrefHeight());
         paintPane.snapshot(null, image);
         return image;
+    }
+    
+    public WritableImage getCropImageOfPane(int x, int y, int width, int height){
+        WritableImage image = new WritableImage((int) paintPane.getPrefWidth(), (int) paintPane.getPrefHeight());
+        paintPane.snapshot(null, image);
+        PixelReader pxReader = image.getPixelReader();
+        return new WritableImage(pxReader, x, y, width, height);
     }
 
     public void addNodeToPaintPane(Node... nodes) {

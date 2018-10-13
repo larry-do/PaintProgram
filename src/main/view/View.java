@@ -27,7 +27,7 @@ import javafx.scene.paint.Color;
 public class View {
 
     private final int SCENE_WIDTH = 1200;
-    private final int SCENE_HEIGHT = 720;
+    private final int SCENE_HEIGHT = 680;
     private final int X_MENUBAR = 0, Y_MENUBAR = 0;
     private final int W_MENUBAR = SCENE_WIDTH + 10, H_MENUBAR = 25;
     private final int X_TOOLBAR = 0, Y_TOOLBAR = H_MENUBAR;
@@ -96,6 +96,22 @@ public class View {
     public void saveAsMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInSaveAsMenuItem(eventHandler);
     }
+    
+    public void undoMenuAction(EventHandler<ActionEvent> eventHandler){
+        menuBarView.addEventHandlerInUndoMenuItem(eventHandler);
+    }
+    
+    public void redoMenuAction(EventHandler<ActionEvent> eventHandler){
+        menuBarView.addEventHandlerInRedoMenuItem(eventHandler);
+    }
+    
+    public void pasteMenuAction(EventHandler<ActionEvent> eventHandler){
+        menuBarView.addEventHandlerInPasteMenuItem(eventHandler);
+    }
+    
+    public void saveMenuAction(EventHandler<ActionEvent> eventHandler){
+        menuBarView.addEventHandlerInSaveMenuItem(eventHandler);
+    }
 
     public <T extends Event> void addEventHandlerInScene(EventType<T> eventType, EventHandler<? super T> eventHandler) {
         scene.addEventFilter(eventType, eventHandler);
@@ -137,6 +153,10 @@ public class View {
 
     public WritableImage getImageOfPane() {
         return paintScrollPane.getImageOfPane();
+    }
+    
+    public WritableImage getCropImageOfPane(int x, int y, int width, int height){
+        return paintScrollPane.getCropImageOfPane(x, y, width, height);
     }
 
     public void addNodeToPaintPane(Node... nodes) {

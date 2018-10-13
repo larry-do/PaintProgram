@@ -19,23 +19,19 @@ import javafx.scene.transform.Scale;
  */
 public class ImageInsertion extends AreaPane implements Tool {
 
-    private Image image;
     private ImageView imageView;
 
     public ImageInsertion() {
         super(0, 0);
-        image = null;
         imageView = null;
     }
 
     public void setImage(Image image) {
-        this.image = image;
         this.imageView = new ImageView(image);
         this.getChildren().add(imageView);
         this.setSize(image.getWidth(), image.getHeight());
         this.setActiveState(true);
         this.showBorder();
-
     }
 
     @Override
@@ -68,6 +64,13 @@ public class ImageInsertion extends AreaPane implements Tool {
 
     @Override
     public Node mouseReleasedHandling(MouseEvent event) {
+        this.setMovingState(false);
         return null;
+    }
+
+    public void setOff() {
+        setMovingState(false);
+        setActiveState(false);
+        setCursorHoveringImage(HoverState.NULL);
     }
 }

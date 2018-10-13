@@ -62,7 +62,7 @@ public class SquareTriangleDrawer extends ShapeDrawer implements Tool {
         polygon.setStroke(color);
         polygon.setStrokeWidth(strokeWidth);
         polygon.setStrokeLineCap(strokeLineCap);
-        areaPane.hideBoder();
+        areaPane.hideBorder();
         areaPane.getChildren().add(polygon);
         areaPane.showBorder();
         return null;

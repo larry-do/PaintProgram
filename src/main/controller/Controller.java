@@ -62,7 +62,7 @@ public class Controller {
 
     private ImageInsertion imageInsertion;
 
-    private ToolType currentTool;
+    private ToolType currentTool, lastTool;
 
     private Stack<WritableImage> undoStack, redoStack;
 
@@ -105,6 +105,7 @@ public class Controller {
         exitMenuAction();
         saveAsMenuAction();
         saveWithKeyBoard();
+
         toggleBtnGroupAction();
         colorChooserAction();
         sizeOfPenSliderAction();
@@ -113,6 +114,9 @@ public class Controller {
         copyAndPasteImage();
         newMenuAction();
         saveMenuAction();
+        undoMenuAction();
+        redoMenuAction();
+        pasteMenuAction();
     }
 
     //<editor-fold defaultstate="collapsed" desc="Các thao tác với chuột">
@@ -124,7 +128,7 @@ public class Controller {
                     mousePressedHandling(event);
                 }
             }
-            
+
         });
         view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
             @Override
@@ -133,17 +137,17 @@ public class Controller {
                     mouseDraggedHandling(event);
                 }
             }
-            
+
         });
         view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 mouseReleasedHandling(event);
             }
-            
+
         });
     }
-    
+
     private void mousePressedHandling(MouseEvent event) {
         if (null != currentTool) {
             Node node;
@@ -207,8 +211,7 @@ public class Controller {
                 case IMAGE_INSERTION:
                     imageInsertion.mousePressedHandling(event);
                     if (!imageInsertion.getActiveState()) {
-                        setTool(ToolType.PENCIL);
-                        pencil.mousePressedHandling(event);
+                        setTool(lastTool);
                     }
                     break;
                 default:
@@ -216,7 +219,7 @@ public class Controller {
             }
         }
     }
-    
+
     private void mouseDraggedHandling(MouseEvent event) {
         if (null != currentTool) {
             Node node;
@@ -265,7 +268,7 @@ public class Controller {
             }
         }
     }
-    
+
     private void mouseReleasedHandling(MouseEvent event) {
         if (null != currentTool) {
             switch (currentTool) {
@@ -290,6 +293,9 @@ public class Controller {
                 case CALLIGRAPHY_PEN:
                     calligraphyPen.mouseReleasedHandling(event);
                     break;
+                case IMAGE_INSERTION:
+                    imageInsertion.mouseReleasedHandling(event);
+                    break;
                 default:
                     break;
             }
@@ -309,7 +315,7 @@ public class Controller {
         }
     }
     //</editor-fold>
-    
+
     private void keyboardActionHandler() {
         view.addEventHandlerInScene(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
@@ -416,6 +422,9 @@ public class Controller {
     }
 
     private void setTool(ToolType type) {
+        System.out.println(type);
+        if(type == currentTool) return;
+        lastTool = currentTool;
         switch (type) {
             case RECTANGLE:
                 currentTool = ToolType.RECTANGLE;
@@ -513,6 +522,7 @@ public class Controller {
             default:
                 break;
         }
+        if(lastTool == null) lastTool = currentTool;
     }
 
     private boolean isWithinPaintPane(double x, double y) {
@@ -526,6 +536,7 @@ public class Controller {
                 if (newValue) {
                     ctrlPressed.set(false);
                     keySPressed.set(false);
+                    setOffAllTools();
                     if (model.isFileEmpty()) {
                         model.saveAs(view.getImageOfPane());
                     } else {
@@ -553,11 +564,7 @@ public class Controller {
         view.saveAsMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
+                setOffAllTools();
                 model.saveAs(view.getImageOfPane());
             }
         });
@@ -586,6 +593,24 @@ public class Controller {
         });
     }
 
+    private void undoMenuAction() {
+        view.undoMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                getUndo();
+            }
+        });
+    }
+
+    private void redoMenuAction() {
+        view.redoMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                getRedo();
+            }
+        });
+    }
+
     private void addZoomPaintPaneHandler() {
         view.addZoomableScrollPaneEventHandler(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
             @Override
@@ -598,27 +623,30 @@ public class Controller {
         });
     }
 
+    private void setPasteImage() {
+        imageInsertion.setOff();
+        imageInsertion = new ImageInsertion();
+        Image image = model.getImageFromClipboard();
+        if (image != null) {
+            imageInsertion.setImage(image);
+            if (imageInsertion.getPrefHeight() > view.getPaintPaneHeight()) {
+                view.setSizePaintPane(view.getPaintPaneWidth(), imageInsertion.getPrefHeight());
+            }
+            if (imageInsertion.getPrefWidth() > view.getPaintPaneWidth()) {
+                view.setSizePaintPane(imageInsertion.getPrefWidth(), view.getPaintPaneHeight());
+            }
+            view.addNodeToPaintPane(imageInsertion);
+            updateUndoRedo();
+            setTool(ToolType.IMAGE_INSERTION);
+        }
+    }
+
     private void copyAndPasteImage() {
         combineKeyCtrlAndV.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
-                    Image image = model.getImageFromClipboard();
-                    if (image != null) {
-                        imageInsertion.setActiveState(false);
-                        imageInsertion = new ImageInsertion();
-                        imageInsertion.setImage(image);
-
-                        if (imageInsertion.getPrefHeight() > view.getPaintPaneHeight()) {
-                            view.setSizePaintPane(view.getPaintPaneWidth(), imageInsertion.getPrefHeight());
-                        }
-                        if (imageInsertion.getPrefWidth() > view.getPaintPaneWidth()) {
-                            view.setSizePaintPane(imageInsertion.getPrefWidth(), view.getPaintPaneHeight());
-                        }
-                        view.addNodeToPaintPane(imageInsertion);
-                        updateUndoRedo();
-                        setTool(ToolType.IMAGE_INSERTION);
-                    }
+                    setPasteImage();
                 }
             }
         });
@@ -629,19 +657,32 @@ public class Controller {
         redoStack.removeAllElements();
     }
 
+    private void getUndo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.add(undoStack.pop());
+        }
+        view.removeAllNodePaintPane();
+        if (!undoStack.isEmpty()) {
+            view.setSizePaintPane(undoStack.peek().getWidth(), undoStack.peek().getHeight());
+            view.addNodeToPaintPane(new ImageView(undoStack.peek()));
+        }
+    }
+
+    private void getRedo() {
+        if (!redoStack.isEmpty()) {
+            view.removeAllNodePaintPane();
+            view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
+            view.addNodeToPaintPane(new ImageView(redoStack.peek()));
+            undoStack.add(redoStack.pop());
+        }
+    }
+
     private void undoRedoActionHandler() {
         combineKeyCtrlAndZ.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
-                    if (!undoStack.isEmpty()) {
-                        redoStack.add(undoStack.pop());
-                    }
-                    view.removeAllNodePaintPane();
-                    if (!undoStack.isEmpty()) {
-                        view.setSizePaintPane(undoStack.peek().getWidth(), undoStack.peek().getHeight());
-                        view.addNodeToPaintPane(new ImageView(undoStack.peek()));
-                    }
+                    getUndo();
                 }
             }
         });
@@ -649,13 +690,17 @@ public class Controller {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (newValue) {
-                    if (!redoStack.isEmpty()) {
-                        view.removeAllNodePaintPane();
-                        view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
-                        view.addNodeToPaintPane(new ImageView(redoStack.peek()));
-                        undoStack.add(redoStack.pop());
-                    }
+                    getRedo();
                 }
+            }
+        });
+    }
+
+    private void pasteMenuAction() {
+        view.pasteMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                setPasteImage();
             }
         });
     }
@@ -674,15 +719,25 @@ public class Controller {
     }
 
     private void saveMenuAction() {
-        if (model.isFileEmpty()) {
-            saveAsMenuAction();
-        } else {
-            rectangleDrawer.setActiveState(false);
-            roundedRectangleDrawer.setActiveState(false);
-            squareTriangleDrawer.setActiveState(false);
-            curveLineDrawer.setActiveState(false);
-            imageInsertion.setActiveState(false);
-            model.saveAs(view.getImageOfPane());
-        }
+        view.saveMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                setOffAllTools();
+                if (model.isFileEmpty()) {
+                    model.saveAs(view.getImageOfPane());
+                } else {
+                    model.writeImageToFile(view.getImageOfPane());
+                }
+            }
+
+        });
+    }
+
+    private void setOffAllTools() {
+        rectangleDrawer.setActiveState(false);
+        roundedRectangleDrawer.setActiveState(false);
+        squareTriangleDrawer.setActiveState(false);
+        curveLineDrawer.setActiveState(false);
+        imageInsertion.setActiveState(false);
     }
 }

@@ -6,6 +6,7 @@
 package drawer;
 
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.ImageCursor;
 import javafx.scene.image.Image;
@@ -53,7 +54,7 @@ public class AreaPane extends Pane {
     private ResizeDot dotUL, dotUM, dotUR, dotMR, dotBR, dotBM, dotBL, dotML;
 
     private boolean activeState;
-    private boolean canMove;
+    private boolean isMoving;
     private EventHandler<MouseEvent> hoverEventHandler;
     private Point2D anchorPoint, anchorPoint_2, startPoint;
     private HoverState state;
@@ -240,29 +241,30 @@ public class AreaPane extends Pane {
         getChildren().addAll(borderRect2, borderRect1, dotUL, dotUM, dotUR, dotMR, dotBR, dotBM, dotBL, dotML);
     }
 
-    public void hideBoder() {
+    public void hideBorder() {
         getChildren().removeAll(borderRect2, borderRect1, dotUL, dotUM, dotUR, dotMR, dotBR, dotBM, dotBL, dotML);
     }
 
     public void setMovingState(boolean state) {
-        canMove = state;
-        if (state) {
-            setCursorHoveringImage(getHoverState());
-        } else {
-            addEventFilter(MouseEvent.ANY, hoverEventHandler);
-        }
+        isMoving = state;
+        setCursorHoveringImage(getHoverState());
     }
 
     public boolean getMovingState() {
-        return canMove;
+        return isMoving;
     }
 
     public void setCursorHoveringImage(HoverState state) {
         if (null != state) {
             switch (state) {
                 case MOVING: {
-                    Image image = new Image("icon/move-cursor.png");
-                    setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+                    if (isMoving) {
+                        Image image = new Image("icon/move-cursor.png");
+                        setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+                    } else {
+                        Image image = new Image("icon/move-cursor-not.png");
+                        setCursor(new ImageCursor(image, image.getWidth() / 2, image.getHeight() / 2));
+                    }
                     break;
                 }
                 case UL: {
@@ -315,8 +317,8 @@ public class AreaPane extends Pane {
     public void setActiveState(boolean state) {
         activeState = state;
         if (state == false) {
-            getChildren().removeAll(borderRect2, borderRect1, dotUL, dotUM, dotUR, dotMR, dotBR, dotBM, dotBL, dotML);
             removeEventFilter(MouseEvent.ANY, hoverEventHandler);
+            hideBorder();
         } else {
             addEventFilter(MouseEvent.ANY, hoverEventHandler);
         }
