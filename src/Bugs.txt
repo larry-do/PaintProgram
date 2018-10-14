@@ -3,4 +3,4 @@
 2. Zoom lên thì bị lỗi calligraphy pen (đã fix)
 
 3. Vẽ đường cong đang lỗi nặng (đã fix 2018/10/14)
-4. Khi nhấn dấu x để thoát thì không có pop up hỏi save (ko phải bug, chưa xử lý thôi)
+4. Khi nhấn dấu x để thoát thì không có pop up hỏi save (đã thêm chức năng)

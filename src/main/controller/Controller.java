@@ -27,6 +27,7 @@ import main.view.View;
 
 public class Controller {
 
+    //<editor-fold defaultstate="opened" desc="Variables">
     private Model model;
     private View view;
 
@@ -56,8 +57,11 @@ public class Controller {
     private ToolType currentTool, lastTool;
 
     private Stack<WritableImage> undoStack, redoStack;
+    //</editor-fold>
 
     public Controller(View v, Model m) {
+
+        //<editor-fold defaultstate="opened" desc="Initialize Variables">
         model = m;
         view = v;
 
@@ -86,32 +90,23 @@ public class Controller {
 
         undoStack = new Stack<>();
         redoStack = new Stack<>();
+//</editor-fold>
 
         // set default tool
         setTool(ToolType.PENCIL);
 
         mouseActionHandler();
         keyboardActionHandler();
-        openImageFromOutside();
-        exitMenuAction();
-        saveAsMenuAction();
         saveWithKeyBoard();
-
         toggleBtnGroupAction();
         colorChooserAction();
         sizeOfPenSliderAction();
         undoRedoActionHandler();
-        addZoomPaintPaneHandler();
         copyAndPasteImage();
-        newMenuAction();
-        saveMenuAction();
-        undoMenuAction();
-        redoMenuAction();
-        pasteMenuAction();
-        aboutMenuAction();
+        addActionToMenuItemInMenuBar();
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Các thao tác với chuột">
+    //<editor-fold defaultstate="opened" desc="Các thao tác với chuột">
     private void mouseActionHandler() {
         view.addEventHandlerIntoPaintPane(MouseEvent.ANY, new EventHandler<MouseEvent>() {
             @Override
@@ -145,6 +140,15 @@ public class Controller {
                 mouseReleasedHandling(event);
             }
 
+        });
+        view.addZoomableScrollPaneEventHandler(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if (event.isControlDown()) {
+                    event.consume();
+                    view.zoomPaintPane(event.getTextDeltaY(), new Point2D(event.getX(), event.getY()));
+                }
+            }
         });
     }
 
@@ -376,6 +380,103 @@ public class Controller {
         });
     }
 
+    private void addActionToMenuItemInMenuBar() {
+        // exit
+        view.exitMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (view.isPaintPaneEmpty() == false) {
+                    if (view.showSavingConfirmationMessage()) {
+                        saveImageUtility();
+                    }
+                }
+                view.exitAboutWindow();
+                Platform.exit();
+                System.exit(0);
+            }
+        });
+        // save as
+        view.saveAsMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                setOffAllTools();
+                model.saveAs(view.getImageOfPane());
+            }
+        });
+        // undo
+        view.undoMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                getUndo();
+            }
+        });
+        // redo
+        view.redoMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                getRedo();
+            }
+        });
+        // open image
+        view.openImageFromOutside(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Image image = model.getImageFromFile();
+                if (image != null) {
+                    imageInsertion.setActiveState(false);
+                    imageInsertion = new ImageInsertion();
+                    imageInsertion.setImage(image);
+
+                    if (view.isPaintPaneEmpty() == false) {
+                        if (view.showSavingConfirmationMessage()) {
+                            saveImageUtility();
+                        }
+                    }
+                    view.removeAllNodePaintPane();
+                    view.setSizePaintPane(imageInsertion.getPrefWidth(), imageInsertion.getPrefHeight());
+                    view.addNodeToPaintPane(imageInsertion);
+                    updateUndoRedo();
+                    setTool(ToolType.IMAGE_INSERTION);
+                }
+            }
+        });
+        // paste
+        view.pasteMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                setPasteImage();
+            }
+        });
+        // new
+        view.newMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (view.isPaintPaneEmpty() == false) {
+                    if (view.showSavingConfirmationMessage()) {
+                        saveImageUtility();
+                    }
+                }
+                view.removeAllNodePaintPane();
+                model.resetModel();
+            }
+        });
+        // save
+        view.saveMenuAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                saveImageUtility();
+            }
+
+        });
+        // about
+        view.aboutMenuAcion(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                view.displayAboutWindow();
+            }
+        });
+    }
+
     private void sizeOfPenSliderAction() {
         view.addListenerInSlider(new ChangeListener<Number>() {
             @Override
@@ -401,6 +502,61 @@ public class Controller {
         });
     }
 
+    private void toggleBtnGroupAction() {
+        view.addListenerInToggleGroup(new ChangeListener<Toggle>() {
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                if (newValue.getUserData() != null) {
+                    setTool((ToolType) newValue.getUserData());
+                }
+            }
+        });
+    }
+
+    private void saveWithKeyBoard() {
+        combineKeyCtrlAndS.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    ctrlPressed.set(false);
+                    keySPressed.set(false);
+                    saveImageUtility();
+                }
+            }
+        });
+    }
+
+    private void copyAndPasteImage() {
+        combineKeyCtrlAndV.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    setPasteImage();
+                }
+            }
+        });
+    }
+
+    private void undoRedoActionHandler() {
+        combineKeyCtrlAndZ.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    getUndo();
+                }
+            }
+        });
+        combineKeyCtrlAndY.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    getRedo();
+                }
+            }
+        });
+    }
+
+    //<editor-fold defaultstate="opened" desc="Utility Function">
     private void changeColorOfTools(Color color) {
         rectangleDrawer.setColor(color);
         roundedRectangleDrawer.setColor(color);
@@ -413,15 +569,26 @@ public class Controller {
         floodFiller.setColor(color);
     }
 
-    private void toggleBtnGroupAction() {
-        view.addListenerInToggleGroup(new ChangeListener<Toggle>() {
-            @Override
-            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
-                if (newValue.getUserData() != null) {
-                    setTool((ToolType) newValue.getUserData());
-                }
+    private boolean isWithinPaintPane(double x, double y) {
+        return !(x < 0 || y < 0 || x >= view.getPaintPaneWidth() || y >= view.getPaintPaneHeight());
+    }
+
+    private void setPasteImage() {
+        imageInsertion.setOff();
+        imageInsertion = new ImageInsertion();
+        Image image = model.getImageFromClipboard();
+        if (image != null) {
+            imageInsertion.setImage(image);
+            if (imageInsertion.getPrefHeight() > view.getPaintPaneHeight()) {
+                view.setSizePaintPane(view.getPaintPaneWidth(), imageInsertion.getPrefHeight());
             }
-        });
+            if (imageInsertion.getPrefWidth() > view.getPaintPaneWidth()) {
+                view.setSizePaintPane(imageInsertion.getPrefWidth(), view.getPaintPaneHeight());
+            }
+            view.addNodeToPaintPane(imageInsertion);
+            updateUndoRedo();
+            setTool(ToolType.IMAGE_INSERTION);
+        }
     }
 
     private void setTool(ToolType type) {
@@ -531,148 +698,7 @@ public class Controller {
         }
     }
 
-    private boolean isWithinPaintPane(double x, double y) {
-        return !(x < 0 || y < 0 || x >= view.getPaintPaneWidth() || y >= view.getPaintPaneHeight());
-    }
-
-    private void saveWithKeyBoard() {
-        combineKeyCtrlAndS.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    ctrlPressed.set(false);
-                    keySPressed.set(false);
-                    setOffAllTools();
-                    if (model.isFileEmpty()) {
-                        model.saveAs(view.getImageOfPane());
-                    } else {
-                        model.writeImageToFile(view.getImageOfPane());
-                    }
-                }
-            }
-        });
-    }
-
-    private void exitMenuAction() {
-        view.exitMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (view.isPaintPaneEmpty() == false) {
-                    if (view.showSavingConfirmationMessage()) {
-                        setOffAllTools();
-                        if (model.isFileEmpty()) {
-                            model.saveAs(view.getImageOfPane());
-                        } else {
-                            model.writeImageToFile(view.getImageOfPane());
-                        }
-                    }
-                }
-                view.exitAboutWindow();
-                Platform.exit();
-                System.exit(0);
-            }
-        });
-    }
-
-    private void saveAsMenuAction() {
-        view.saveAsMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                setOffAllTools();
-                model.saveAs(view.getImageOfPane());
-            }
-        });
-    }
-
-    private void openImageFromOutside() {
-        view.openImageFromOutside(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Image image = model.getImageFromFile();
-                if (image != null) {
-                    imageInsertion.setActiveState(false);
-                    imageInsertion = new ImageInsertion();
-                    imageInsertion.setImage(image);
-
-                    if (view.isPaintPaneEmpty() == false) {
-                        if (view.showSavingConfirmationMessage()) {
-                            setOffAllTools();
-                            if (model.isFileEmpty()) {
-                                model.saveAs(view.getImageOfPane());
-                            } else {
-                                model.writeImageToFile(view.getImageOfPane());
-                            }
-                        }
-                    }
-                    view.removeAllNodePaintPane();
-                    view.setSizePaintPane(imageInsertion.getPrefWidth(), imageInsertion.getPrefHeight());
-                    view.addNodeToPaintPane(imageInsertion);
-                    updateUndoRedo();
-                    setTool(ToolType.IMAGE_INSERTION);
-                }
-            }
-        });
-    }
-
-    private void undoMenuAction() {
-        view.undoMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                getUndo();
-            }
-        });
-    }
-
-    private void redoMenuAction() {
-        view.redoMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                getRedo();
-            }
-        });
-    }
-
-    private void addZoomPaintPaneHandler() {
-        view.addZoomableScrollPaneEventHandler(ScrollEvent.SCROLL, new EventHandler<ScrollEvent>() {
-            @Override
-            public void handle(ScrollEvent event) {
-                if (event.isControlDown()) {
-                    event.consume();
-                    view.zoomPaintPane(event.getTextDeltaY(), new Point2D(event.getX(), event.getY()));
-                }
-            }
-        });
-    }
-
-    private void setPasteImage() {
-        imageInsertion.setOff();
-        imageInsertion = new ImageInsertion();
-        Image image = model.getImageFromClipboard();
-        if (image != null) {
-            imageInsertion.setImage(image);
-            if (imageInsertion.getPrefHeight() > view.getPaintPaneHeight()) {
-                view.setSizePaintPane(view.getPaintPaneWidth(), imageInsertion.getPrefHeight());
-            }
-            if (imageInsertion.getPrefWidth() > view.getPaintPaneWidth()) {
-                view.setSizePaintPane(imageInsertion.getPrefWidth(), view.getPaintPaneHeight());
-            }
-            view.addNodeToPaintPane(imageInsertion);
-            updateUndoRedo();
-            setTool(ToolType.IMAGE_INSERTION);
-        }
-    }
-
-    private void copyAndPasteImage() {
-        combineKeyCtrlAndV.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    setPasteImage();
-                }
-            }
-        });
-    }
-
+    //<editor-fold defaultstate="opened" desc="Undo Redo Utility">
     private void updateUndoRedo() {
         undoStack.add(view.getImageOfPane());
         redoStack.removeAllElements();
@@ -697,78 +723,7 @@ public class Controller {
             undoStack.add(redoStack.pop());
         }
     }
-
-    private void undoRedoActionHandler() {
-        combineKeyCtrlAndZ.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    getUndo();
-                }
-            }
-        });
-        combineKeyCtrlAndY.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    getRedo();
-                }
-            }
-        });
-    }
-
-    private void pasteMenuAction() {
-        view.pasteMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                setPasteImage();
-            }
-        });
-    }
-
-    private void newMenuAction() {
-        view.newMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (view.isPaintPaneEmpty() == false) {
-                    if (view.showSavingConfirmationMessage()) {
-                        setOffAllTools();
-                        if (model.isFileEmpty()) {
-                            model.saveAs(view.getImageOfPane());
-                        } else {
-                            model.writeImageToFile(view.getImageOfPane());
-                        }
-                    }
-                }
-                view.removeAllNodePaintPane();
-                model.resetModel();
-            }
-        });
-    }
-
-    private void saveMenuAction() {
-        view.saveMenuAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                setOffAllTools();
-                if (model.isFileEmpty()) {
-                    model.saveAs(view.getImageOfPane());
-                } else {
-                    model.writeImageToFile(view.getImageOfPane());
-                }
-            }
-
-        });
-    }
-    
-    private void aboutMenuAction(){
-        view.aboutMenuAcion(new EventHandler<ActionEvent>(){
-            @Override
-            public void handle(ActionEvent event) {
-                view.displayAboutWindow();
-            }
-        });
-    }
+    //</editor-fold>
 
     private void setOffAllTools() {
         rectangleDrawer.setActiveState(false);
@@ -777,4 +732,14 @@ public class Controller {
         curveLineDrawer.setActiveState(false);
         imageInsertion.setActiveState(false);
     }
+
+    public void saveImageUtility() {
+        setOffAllTools();
+        if (model.isFileEmpty()) {
+            model.saveAs(view.getImageOfPane());
+        } else {
+            model.writeImageToFile(view.getImageOfPane());
+        }
+    }
+    //</editor-fold>
 }

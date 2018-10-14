@@ -6,8 +6,10 @@
 package main;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import main.controller.Controller;
 import main.model.Model;
 import main.view.View;
@@ -40,6 +42,14 @@ public class FXMain extends Application {
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("icon/app-icon.png"));
         primaryStage.show();
+        
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
+            @Override
+            public void handle(WindowEvent event) {
+                controller.saveImageUtility();
+                primaryStage.close();
+            }
+        });
     }
 
 }
