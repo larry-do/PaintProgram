@@ -1,3 +1,3 @@
 1. Zoom lên thì không thấy pixel của nét vẽ, khi đổ màu thì thấy nhưng mờ, lưu lại thì vẫn bình thường có pixel
 2. Zoom lên thì bị lỗi calligraphy pen (đã fix)
-3. Vẽ đường cong đang lỗi nặng
+3. Vẽ đường cong đang lỗi nặng (đã fix 2018/10/14)

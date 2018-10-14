@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.view;
 
 import javafx.beans.value.ChangeListener;
@@ -20,10 +15,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-/**
- *
- * @author Admin
- */
 public class View {
 
     private final int SCENE_WIDTH = 1200;
@@ -96,20 +87,20 @@ public class View {
     public void saveAsMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInSaveAsMenuItem(eventHandler);
     }
-    
-    public void undoMenuAction(EventHandler<ActionEvent> eventHandler){
+
+    public void undoMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInUndoMenuItem(eventHandler);
     }
-    
-    public void redoMenuAction(EventHandler<ActionEvent> eventHandler){
+
+    public void redoMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInRedoMenuItem(eventHandler);
     }
-    
-    public void pasteMenuAction(EventHandler<ActionEvent> eventHandler){
+
+    public void pasteMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInPasteMenuItem(eventHandler);
     }
-    
-    public void saveMenuAction(EventHandler<ActionEvent> eventHandler){
+
+    public void saveMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInSaveMenuItem(eventHandler);
     }
 
@@ -154,8 +145,8 @@ public class View {
     public WritableImage getImageOfPane() {
         return paintScrollPane.getImageOfPane();
     }
-    
-    public WritableImage getCropImageOfPane(int x, int y, int width, int height){
+
+    public WritableImage getCropImageOfPane(int x, int y, int width, int height) {
         return paintScrollPane.getCropImageOfPane(x, y, width, height);
     }
 

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.controller;
 
 import drawer.NotClassifiedTool.ColorPicker;
@@ -30,10 +25,6 @@ import javafx.scene.shape.Line;
 import main.model.Model;
 import main.view.View;
 
-/**
- *
- * @author Admin
- */
 public class Controller {
 
     private Model model;
@@ -282,7 +273,10 @@ public class Controller {
                     squareTriangleDrawer.mouseReleasedHandling(event);
                     break;
                 case CURVE_LINE:
-                    curveLineDrawer.mouseReleasedHandling(event);
+                    Node node = curveLineDrawer.mouseReleasedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
                     break;
                 case AIRBRUSH:
                     airbrush.mouseReleasedHandling(event);
@@ -422,8 +416,9 @@ public class Controller {
     }
 
     private void setTool(ToolType type) {
-        System.out.println(type);
-        if(type == currentTool) return;
+        if (type == currentTool) {
+            return;
+        }
         lastTool = currentTool;
         switch (type) {
             case RECTANGLE:
@@ -522,7 +517,9 @@ public class Controller {
             default:
                 break;
         }
-        if(lastTool == null) lastTool = currentTool;
+        if (lastTool == null) {
+            lastTool = currentTool;
+        }
     }
 
     private boolean isWithinPaintPane(double x, double y) {
