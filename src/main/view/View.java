@@ -9,7 +9,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
@@ -34,6 +33,10 @@ public class View {
     private MenuBarView menuBarView;
 
     private ToolBarView toolBarView;
+
+    private SavingConfirmationDialog savingConfirmationDialog;
+    
+    private final AboutWindow aboutWindow;
 
     public View() {
         // khởi tạo scene, backgroundPane và primaryStage
@@ -70,6 +73,12 @@ public class View {
 
         backgroundPane.getChildren().add(toolBarView);
         //</editor-fold>
+
+        savingConfirmationDialog = new SavingConfirmationDialog();
+        
+        aboutWindow = new AboutWindow();
+
+        showCurrentImageSizeOnScreen((int) paintScrollPane.getPaintPaneWidth(), (int) paintScrollPane.getPaintPaneHeight());
     }
 
     public void newMenuAction(EventHandler<ActionEvent> eventHandler) {
@@ -102,6 +111,10 @@ public class View {
 
     public void saveMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInSaveMenuItem(eventHandler);
+    }
+    
+    public void aboutMenuAcion(EventHandler<ActionEvent> eventHandler){
+        menuBarView.addEventHandlerInAboutMenuItem(eventHandler);
     }
 
     public <T extends Event> void addEventHandlerInScene(EventType<T> eventType, EventHandler<? super T> eventHandler) {
@@ -179,13 +192,23 @@ public class View {
         return scene;
     }
 
-    public void showAlertMessage(String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
+    public boolean showSavingConfirmationMessage() {
+        return savingConfirmationDialog.showToUser();
+    }
 
-        alert.setTitle("Error!");
-        alert.setHeaderText("You got a error!");
-        alert.setContentText(message);
+    public void showCurrentPositionOfMouseOnScreen(int x, int y) {
+        toolBarView.showCurrentPositionOfMouseOnScreen(x, y);
+    }
 
-        alert.showAndWait();
+    public void showCurrentImageSizeOnScreen(int x, int y) {
+        toolBarView.showCurrentImageSizeOnScreen(x, y);
+    }
+    
+    public void displayAboutWindow(){
+        aboutWindow.show();
+    }
+    
+    public void exitAboutWindow(){
+        aboutWindow.close();
     }
 }

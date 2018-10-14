@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.view;
 
 import javafx.event.Event;
@@ -16,14 +11,10 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 
-/**
- *
- * @author Admin
- */
 public class PaintArea extends ZoomableScrollPane {
 
-    private final int DEFAULT_PAINT_WIDTH = 1110;
-    private final int DEFAULT_PAINT_HEIGHT = 695;
+    private final int DEFAULT_PAINT_WIDTH = 1920;
+    private final int DEFAULT_PAINT_HEIGHT = 1080;
 
     private Pane paintPane;
 

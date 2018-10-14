@@ -108,10 +108,19 @@ public class Controller {
         undoMenuAction();
         redoMenuAction();
         pasteMenuAction();
+        aboutMenuAction();
     }
 
     //<editor-fold defaultstate="collapsed" desc="Các thao tác với chuột">
     private void mouseActionHandler() {
+        view.addEventHandlerIntoPaintPane(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (isWithinPaintPane(event.getX(), event.getY())) {
+                    view.showCurrentPositionOfMouseOnScreen((int) event.getX(), (int) event.getY());
+                }
+            }
+        });
         view.addEventHandlerIntoPaintPane(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -548,9 +557,17 @@ public class Controller {
         view.exitMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (view.isPaintPaneEmpty()) {
-                    // hỏi người dùng xem có muốn save không?
+                if (view.isPaintPaneEmpty() == false) {
+                    if (view.showSavingConfirmationMessage()) {
+                        setOffAllTools();
+                        if (model.isFileEmpty()) {
+                            model.saveAs(view.getImageOfPane());
+                        } else {
+                            model.writeImageToFile(view.getImageOfPane());
+                        }
+                    }
                 }
+                view.exitAboutWindow();
                 Platform.exit();
                 System.exit(0);
             }
@@ -577,8 +594,15 @@ public class Controller {
                     imageInsertion = new ImageInsertion();
                     imageInsertion.setImage(image);
 
-                    if (view.isPaintPaneEmpty()) {
-                        // hỏi người dùng xem có muốn save không?
+                    if (view.isPaintPaneEmpty() == false) {
+                        if (view.showSavingConfirmationMessage()) {
+                            setOffAllTools();
+                            if (model.isFileEmpty()) {
+                                model.saveAs(view.getImageOfPane());
+                            } else {
+                                model.writeImageToFile(view.getImageOfPane());
+                            }
+                        }
                     }
                     view.removeAllNodePaintPane();
                     view.setSizePaintPane(imageInsertion.getPrefWidth(), imageInsertion.getPrefHeight());
@@ -706,8 +730,15 @@ public class Controller {
         view.newMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (!view.isPaintPaneEmpty()) {
-                    // hoi xem co lưu lại không
+                if (view.isPaintPaneEmpty() == false) {
+                    if (view.showSavingConfirmationMessage()) {
+                        setOffAllTools();
+                        if (model.isFileEmpty()) {
+                            model.saveAs(view.getImageOfPane());
+                        } else {
+                            model.writeImageToFile(view.getImageOfPane());
+                        }
+                    }
                 }
                 view.removeAllNodePaintPane();
                 model.resetModel();
@@ -727,6 +758,15 @@ public class Controller {
                 }
             }
 
+        });
+    }
+    
+    private void aboutMenuAction(){
+        view.aboutMenuAcion(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                view.displayAboutWindow();
+            }
         });
     }
 

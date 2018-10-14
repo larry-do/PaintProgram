@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.view;
 
 import drawer.Tool.ToolType;
@@ -11,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Toggle;
@@ -21,18 +17,21 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-/**
- *
- * @author Admin
- */
 public class ToolBarView extends GridPane {
 
     private ToggleGroup toggleGroup;
     private RadioButton rectangleBtn, roundedRectangleBtn, squareTriangleBtn, curveLineBtn;
     private RadioButton pencilBtn, airbrushBtn, brushBtn, calligraphyBtn;
     private RadioButton colorPickerBtn, floodFillerBtn;
+
+    private Label colorChooserLabel;
     private ColorPicker colorChooser;
+
+    private Label sizeOfPenSliderLabel;
     private Slider sizeOfPenSlider;
+
+    private Label currentPositionOfMouseHeader, currentPositionOfMouseContent;
+    private Label currentImageSizeHeader, currentImageSizeContent;
 
     public ToolBarView() {
         super();
@@ -149,7 +148,7 @@ public class ToolBarView extends GridPane {
         calligraphyBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         calligraphyBtn.setTooltip(new Tooltip("Calligraphy Pen"));
         add(calligraphyBtn, 1, 3);
-        
+
         colorPickerBtn = new RadioButton("colorPicker");
         colorPickerBtn.setToggleGroup(toggleGroup);
         colorPickerBtn.setUserData(ToolType.COLOR_PICKER);
@@ -162,7 +161,7 @@ public class ToolBarView extends GridPane {
         colorPickerBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         colorPickerBtn.setTooltip(new Tooltip("Color picker"));
         add(colorPickerBtn, 0, 4);
-        
+
         floodFillerBtn = new RadioButton("floodFiller");
         floodFillerBtn.setToggleGroup(toggleGroup);
         floodFillerBtn.setUserData(ToolType.FLOOD_FILLER);
@@ -176,6 +175,8 @@ public class ToolBarView extends GridPane {
         floodFillerBtn.setTooltip(new Tooltip("Flood Filler"));
         add(floodFillerBtn, 1, 4);
 
+        colorChooserLabel = new Label("Color Chooser");
+        add(colorChooserLabel, 0, 5, 2, 1);
         colorChooser = new ColorPicker(Color.BLACK);
         colorChooser.getStyleClass().add("button");
         Tooltip colorPickerTooltip = new Tooltip(colorChooser.getValue().toString());
@@ -186,8 +187,10 @@ public class ToolBarView extends GridPane {
                 colorPickerTooltip.setText(newValue.toString());
             }
         });
-        add(colorChooser, 0, 5, 2, 1);
+        add(colorChooser, 0, 6, 2, 1);
 
+        sizeOfPenSliderLabel = new Label("Pen Size");
+        add(sizeOfPenSliderLabel, 0, 7, 2, 1);
         sizeOfPenSlider = new Slider();
         sizeOfPenSlider.setMax(15);
         sizeOfPenSlider.setMin(1);
@@ -200,7 +203,25 @@ public class ToolBarView extends GridPane {
                 sizeTooltip.setText(Integer.toString(newValue.intValue()));
             }
         });
-        add(sizeOfPenSlider, 0, 6, 2, 1);
+        add(sizeOfPenSlider, 0, 8, 2, 1);
+
+        currentPositionOfMouseHeader = new Label("Mouse Pos");
+        currentPositionOfMouseContent = new Label("0 x 0");
+        add(currentPositionOfMouseHeader, 0, 9, 2, 1);
+        add(currentPositionOfMouseContent, 0, 10, 2, 1);
+
+        currentImageSizeHeader = new Label("Image Size");
+        currentImageSizeContent = new Label("0 x 0");
+        add(currentImageSizeHeader, 0, 11, 2, 1);
+        add(currentImageSizeContent, 0, 12, 2, 1);
+    }
+
+    public void showCurrentPositionOfMouseOnScreen(int x, int y) {
+        currentPositionOfMouseContent.setText(x + " x " + y);
+    }
+
+    public void showCurrentImageSizeOnScreen(int x, int y) {
+        currentImageSizeContent.setText(x + " x " + y);
     }
 
     public void addListenerInToggleGroup(ChangeListener<Toggle> listener) {

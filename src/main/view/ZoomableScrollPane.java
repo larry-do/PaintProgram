@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package main.view;
 
 import javafx.event.Event;
@@ -16,10 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
-/**
- *
- * @author Admin
- */
 public class ZoomableScrollPane extends ScrollPane {
 
     private double scaleValue = 0.7;
@@ -39,6 +30,7 @@ public class ZoomableScrollPane extends ScrollPane {
         zoomNode = new Group(target);
         centerNode = centerNode(zoomNode);
         setContent(centerNode);
+        zoomOnTarget(-11.0, new Point2D(1, 1)); // cái này là trick để zoom nhỏ PaintPane khi mở thôi!
     }
 
     public <T extends Event> void addZoomNodeEventHandler(EventType<T> eventType, EventHandler<? super T> eventHandler) {
