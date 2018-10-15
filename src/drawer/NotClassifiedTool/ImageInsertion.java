@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package drawer.NotClassifiedTool;
 
 import drawer.AreaPane;
@@ -13,10 +8,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Scale;
 
-/**
- *
- * @author Admin
- */
 public class ImageInsertion extends AreaPane implements Tool {
 
     private ImageView imageView;

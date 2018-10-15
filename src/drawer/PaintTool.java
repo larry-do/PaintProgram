@@ -1,27 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package drawer;
 
+import javafx.scene.ImageCursor;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
 
-/**
- *
- * @author Admin
- */
 public abstract class PaintTool {
 
     protected Color color;
     protected double strokeWidth;
     protected StrokeLineCap strokeLineCap;
+    
+    protected ImageCursor imageCursor;
 
     public PaintTool() {
         color = Color.BLACK;
         strokeWidth = 1;
         strokeLineCap = StrokeLineCap.ROUND;
+        imageCursor = new ImageCursor();
     }
 
     public void setColor(Color color) {
@@ -34,5 +29,9 @@ public abstract class PaintTool {
 
     public void setStrokeLineCap(StrokeLineCap strokeLineCap) {
         this.strokeLineCap = strokeLineCap;
+    }
+    
+    public ImageCursor getImageCursor(){
+        return imageCursor;
     }
 }

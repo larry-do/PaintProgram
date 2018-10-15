@@ -6,7 +6,6 @@ import javafx.event.EventType;
 import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
@@ -78,8 +77,7 @@ public class PaintArea extends ZoomableScrollPane {
         return paintPane.getPrefHeight();
     }
 
-    public void setImageOfCursorInPaintPane(Image img, double x, double y) {
-        ImageCursor cursor = new ImageCursor(img, x, y);
-        paintPane.setCursor(cursor);
+    public void setImageOfCursorInPaintPane(ImageCursor imageCursor) {
+        paintPane.setCursor(imageCursor);
     }
 }

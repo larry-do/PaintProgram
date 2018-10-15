@@ -7,7 +7,9 @@ package drawer.Pens;
 
 import drawer.Tool;
 import javafx.geometry.Point2D;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
@@ -24,6 +26,8 @@ public class Pencil extends PenTool implements Tool {
         super();
         line = new Line(0, 0, 0, 0);
         this.strokeLineCap = StrokeLineCap.SQUARE;
+        
+        imageCursor = new ImageCursor(new Image("icon/pencil-cursor.png"), 0, 200);
     }
 
     @Override

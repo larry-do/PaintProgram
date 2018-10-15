@@ -2,7 +2,9 @@ package drawer.Pens;
 
 import drawer.Tool;
 import java.util.Random;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Ellipse;
 
@@ -13,6 +15,8 @@ public class Airbrush extends PenTool implements Tool {
     public Airbrush() {
         super();
         random = new Random();
+        
+        imageCursor = new ImageCursor(new Image("icon/airbrush-cursor.png"), 180, 30);
     }
 
     @Override

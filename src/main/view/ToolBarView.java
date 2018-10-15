@@ -20,7 +20,7 @@ import javafx.scene.paint.Color;
 public class ToolBarView extends GridPane {
 
     private ToggleGroup toggleGroup;
-    private RadioButton rectangleBtn, roundedRectangleBtn, squareTriangleBtn, curveLineBtn;
+    private RadioButton rectangleBtn, roundedRectangleBtn, squareTriangleBtn, curveLineBtn, lineBtn;
     private RadioButton pencilBtn, airbrushBtn, brushBtn, calligraphyBtn;
     private RadioButton colorPickerBtn, floodFillerBtn;
 
@@ -95,6 +95,19 @@ public class ToolBarView extends GridPane {
         curveLineBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         curveLineBtn.setTooltip(new Tooltip("Curve Line"));
         add(curveLineBtn, 1, 1);
+        
+        lineBtn = new RadioButton("line");
+        lineBtn.setToggleGroup(toggleGroup);
+        lineBtn.setUserData(ToolType.LINE);
+        lineBtn.getStyleClass().remove("radio-button");
+        lineBtn.getStyleClass().add("toggle-button");
+        ImageView lineIconView = new ImageView(new Image("icon/line-icon.png"));
+        lineIconView.setFitHeight(20);
+        lineIconView.setFitWidth(20);
+        lineBtn.setGraphic(lineIconView);
+        lineBtn.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        lineBtn.setTooltip(new Tooltip("Straight Line"));
+        add(lineBtn, 1, 1);
 
         pencilBtn = new RadioButton("pencil");
         pencilBtn.setToggleGroup(toggleGroup);

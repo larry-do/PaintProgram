@@ -45,6 +45,8 @@ public class Controller {
     private RoundedRectangleDrawer roundedRectangleDrawer;
     private SquareTriangleDrawer squareTriangleDrawer;
     private CurveLineDrawer curveLineDrawer;
+    private LineDrawer lineDrawer;
+
     private Pencil pencil;
     private Airbrush airbrush;
     private Brush brush;
@@ -79,6 +81,8 @@ public class Controller {
         roundedRectangleDrawer = new RoundedRectangleDrawer();
         squareTriangleDrawer = new SquareTriangleDrawer();
         curveLineDrawer = new CurveLineDrawer();
+        lineDrawer = new LineDrawer();
+
         pencil = new Pencil();
         airbrush = new Airbrush();
         brush = new Brush();
@@ -180,6 +184,12 @@ public class Controller {
                         view.addNodeToPaintPane(node);
                     }
                     break;
+                case LINE:
+                    node = lineDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
                 case PENCIL:
                     node = pencil.mousePressedHandling(event);
                     if (node != null) {
@@ -240,6 +250,9 @@ public class Controller {
                 case CURVE_LINE:
                     curveLineDrawer.mouseDraggedHandling(event);
                     break;
+                case LINE:
+                    lineDrawer.mouseDraggedHandling(event);
+                    break;
                 case PENCIL:
                     node = pencil.mouseDraggedHandling(event);
                     if (node != null) {
@@ -291,6 +304,9 @@ public class Controller {
                         view.addNodeToPaintPane(node);
                     }
                     break;
+                case LINE:
+                    lineDrawer.mouseReleasedHandling(event);
+                    break;
                 case AIRBRUSH:
                     airbrush.mouseReleasedHandling(event);
                     break;
@@ -312,12 +328,14 @@ public class Controller {
                 squareTriangleDrawer.setBorderVisiable(false);
                 curveLineDrawer.setBorderVisiable(false);
                 imageInsertion.setBorderVisiable(false);
+                lineDrawer.setBorderVisiable(false);
                 updateUndoRedo();
                 rectangleDrawer.setBorderVisiable(true);
                 roundedRectangleDrawer.setBorderVisiable(true);
                 squareTriangleDrawer.setBorderVisiable(true);
                 curveLineDrawer.setBorderVisiable(true);
                 imageInsertion.setBorderVisiable(true);
+                lineDrawer.setBorderVisiable(true);
             }
         }
     }
@@ -476,6 +494,7 @@ public class Controller {
                 roundedRectangleDrawer.setStrokeWidth(newValue.doubleValue());
                 squareTriangleDrawer.setStrokeWidth(newValue.doubleValue());
                 curveLineDrawer.setStrokeWidth(newValue.doubleValue());
+                lineDrawer.setStrokeWidth(newValue.doubleValue());
                 pencil.setStrokeWidth(newValue.doubleValue());
                 airbrush.setStrokeWidth(newValue.doubleValue());
                 brush.setStrokeWidth(newValue.doubleValue());
@@ -553,6 +572,7 @@ public class Controller {
         roundedRectangleDrawer.setColor(color);
         squareTriangleDrawer.setColor(color);
         curveLineDrawer.setColor(color);
+        lineDrawer.setColor(color);
         pencil.setColor(color);
         airbrush.setColor(color);
         brush.setColor(color);
@@ -591,43 +611,47 @@ public class Controller {
         switch (type) {
             case RECTANGLE:
                 currentTool = ToolType.RECTANGLE;
-                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                view.setImageOfCursorInPaintPane(rectangleDrawer.getImageCursor());
                 break;
             case ROUNDED_RECTANGLE:
                 currentTool = ToolType.ROUNDED_RECTANGLE;
-                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                view.setImageOfCursorInPaintPane(roundedRectangleDrawer.getImageCursor());
                 break;
             case SQUARE_TRIANGLE:
                 currentTool = ToolType.SQUARE_TRIANGLE;
-                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                view.setImageOfCursorInPaintPane(squareTriangleDrawer.getImageCursor());
                 break;
             case CURVE_LINE:
                 currentTool = ToolType.CURVE_LINE;
-                view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
+                view.setImageOfCursorInPaintPane(curveLineDrawer.getImageCursor());
+                break;
+            case LINE:
+                currentTool = ToolType.LINE;
+                view.setImageOfCursorInPaintPane(lineDrawer.getImageCursor());
                 break;
             case PENCIL:
                 currentTool = ToolType.PENCIL;
-                view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 200);
+                view.setImageOfCursorInPaintPane(pencil.getImageCursor());
                 break;
             case AIRBRUSH:
                 currentTool = ToolType.AIRBRUSH;
-                view.setImageOfCursorInPaintPane(new Image("icon/airbrush-cursor.png"), 180, 30);
+                view.setImageOfCursorInPaintPane(airbrush.getImageCursor());
                 break;
             case BRUSH:
                 currentTool = ToolType.BRUSH;
-                view.setImageOfCursorInPaintPane(new Image("icon/brush-cursor.png"), 30, 30);
+                view.setImageOfCursorInPaintPane(brush.getImageCursor());
                 break;
             case CALLIGRAPHY_PEN:
                 currentTool = ToolType.CALLIGRAPHY_PEN;
-                view.setImageOfCursorInPaintPane(new Image("icon/calligraphyPen-cursor.png"), 0, 200);
+                view.setImageOfCursorInPaintPane(calligraphyPen.getImageCursor());
                 break;
             case COLOR_PICKER:
                 currentTool = ToolType.COLOR_PICKER;
-                view.setImageOfCursorInPaintPane(new Image("icon/colorPicker-cursor.png"), 0, 200);
+                view.setImageOfCursorInPaintPane(colorPicker.getImageCursor());
                 break;
             case FLOOD_FILLER:
                 currentTool = ToolType.FLOOD_FILLER;
-                view.setImageOfCursorInPaintPane(new Image("icon/floodFiller-cursor.png"), 200, 200);
+                view.setImageOfCursorInPaintPane(floodFiller.getImageCursor());
                 break;
             case IMAGE_INSERTION:
                 currentTool = ToolType.IMAGE_INSERTION;
@@ -681,6 +705,8 @@ public class Controller {
         squareTriangleDrawer = new SquareTriangleDrawer();
         curveLineDrawer.setActiveState(false);
         curveLineDrawer = new CurveLineDrawer();
+        lineDrawer.setActiveState(false);
+        lineDrawer = new LineDrawer();
         if (hasSetToolJustSetImageInsertion == false) {
             imageInsertion.setActiveState(false);
             imageInsertion = new ImageInsertion();

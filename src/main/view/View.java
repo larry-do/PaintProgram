@@ -8,8 +8,8 @@ import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.ImageCursor;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -183,8 +183,8 @@ public class View {
         return paintScrollPane.getPaintPaneHeight();
     }
 
-    public void setImageOfCursorInPaintPane(Image img, double x, double y) {
-        paintScrollPane.setImageOfCursorInPaintPane(img, x, y);
+    public void setImageOfCursorInPaintPane(ImageCursor imageCursor) {
+        paintScrollPane.setImageOfCursorInPaintPane(imageCursor);
     }
     //</editor-fold>
 

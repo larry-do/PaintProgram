@@ -3,6 +3,8 @@ package drawer.Pens;
 import java.util.ArrayList;
 import java.util.Collection;
 import javafx.geometry.Point2D;
+import javafx.scene.ImageCursor;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
@@ -15,6 +17,8 @@ public class CalligraphyPen extends PenTool {
         super();
         strokeLineCap = StrokeLineCap.SQUARE;
         list = new ArrayList<>();
+        
+        imageCursor = new ImageCursor(new Image("icon/calligraphyPen-cursor.png"), 0, 200);
     }
 
     public ArrayList<Line> mousePressedHandling(MouseEvent event) {

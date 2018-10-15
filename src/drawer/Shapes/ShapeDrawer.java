@@ -1,19 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package drawer.Shapes;
 
 import drawer.AreaPane;
 import drawer.PaintTool;
+import javafx.scene.ImageCursor;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
 
-/**
- *
- * @author Admin
- */
 public abstract class ShapeDrawer extends PaintTool {
     
     protected AreaPane areaPane;
@@ -23,6 +16,8 @@ public abstract class ShapeDrawer extends PaintTool {
         strokeWidth = 1;
         strokeLineCap = StrokeLineCap.ROUND;
         areaPane = new AreaPane(0, 0);
+        
+        imageCursor = new ImageCursor(new Image("icon/shape-cursor.png"), 100, 100);
     }
     
     public void setActiveState(boolean state) {

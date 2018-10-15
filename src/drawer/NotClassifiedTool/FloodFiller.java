@@ -3,7 +3,9 @@ package drawer.NotClassifiedTool;
 import java.util.LinkedList;
 import java.util.Queue;
 import javafx.geometry.Point2D;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
@@ -22,9 +24,13 @@ public class FloodFiller {
     private PixelWriter pixelWriter;
 
     private double width, height;
+    
+    private ImageCursor imageCursor;
 
     public FloodFiller() {
         color = Color.BLACK;
+        
+        imageCursor = new ImageCursor(new Image("icon/floodFiller-cursor.png"), 200, 200);
     }
 
     public Node mousePressedHandling(MouseEvent event, WritableImage image) {
@@ -81,5 +87,9 @@ public class FloodFiller {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+    
+    public ImageCursor getImageCursor(){
+        return imageCursor;
     }
 }
