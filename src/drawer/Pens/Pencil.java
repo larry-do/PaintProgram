@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package drawer.Pens;
 
 import drawer.Tool;
@@ -14,10 +9,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
 
-/**
- *
- * @author Admin
- */
 public class Pencil extends PenTool implements Tool {
 
     private Line line;

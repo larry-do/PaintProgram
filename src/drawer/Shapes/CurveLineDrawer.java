@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.CubicCurve;
+import javafx.scene.shape.StrokeLineCap;
 
 public class CurveLineDrawer extends ShapeDrawer implements Tool {
 
@@ -47,7 +48,7 @@ public class CurveLineDrawer extends ShapeDrawer implements Tool {
 
             areaPane.dragToMoveAndResize(event.getX(), event.getY());
 
-            changeSizeCubicCurve(event.getX(), event.getY()); // thay đổi curve Line theo khung đã được thay đổi
+            changeSizeCubicCurve(); // thay đổi curve Line theo khung đã được thay đổi
         } else {
             changeSizeAreaPane(event.getX(), event.getY());
             switch (pressCount) {
@@ -98,6 +99,7 @@ public class CurveLineDrawer extends ShapeDrawer implements Tool {
         cubicCurve.setStroke(color);
         cubicCurve.setStrokeWidth(strokeWidth);
         cubicCurve.setFill(Color.TRANSPARENT);
+        cubicCurve.setStrokeLineCap(StrokeLineCap.ROUND);
     }
 
     private void changeSizeAreaPane(double x, double y) {
@@ -120,7 +122,7 @@ public class CurveLineDrawer extends ShapeDrawer implements Tool {
         }
     }
 
-    private void changeSizeCubicCurve(double x, double y) {
+    private void changeSizeCubicCurve() {
         cubicCurve.setStartX(areaPane.getPrefWidth() / (p1.getX() - p0.getX()) * (cubicCurve.getStartX() - p0.getX()) + areaPane.getLayoutX());
         cubicCurve.setStartY(areaPane.getPrefHeight() / (p1.getY() - p0.getY()) * (cubicCurve.getStartY() - p0.getY()) + areaPane.getLayoutY());
 

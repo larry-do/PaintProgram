@@ -1,8 +1,6 @@
 package main.controller;
 
-import drawer.NotClassifiedTool.ColorPicker;
-import drawer.NotClassifiedTool.FloodFiller;
-import drawer.NotClassifiedTool.ImageInsertion;
+import drawer.NotClassifiedTool.*;
 import drawer.Pens.*;
 import drawer.Shapes.*;
 import drawer.Tool.ToolType;
@@ -46,6 +44,8 @@ public class Controller {
     private SquareTriangleDrawer squareTriangleDrawer;
     private CurveLineDrawer curveLineDrawer;
     private LineDrawer lineDrawer;
+    private EllipseDrawer ellipseDrawer;
+    private IsoscelesTriangleDrawer isoscelesTriangleDrawer;
 
     private Pencil pencil;
     private Airbrush airbrush;
@@ -53,10 +53,13 @@ public class Controller {
     private CalligraphyPen calligraphyPen;
     private ColorPicker colorPicker;
     private FloodFiller floodFiller;
+    private Eraser eraser;
 
     private ImageInsertion imageInsertion;
 
     private ToolType currentTool, lastTool;
+    private Color currentColor;
+    private double currentStrokeWidth;
 
     private Stack<WritableImage> undoStack, redoStack;
     //</editor-fold>
@@ -82,6 +85,8 @@ public class Controller {
         squareTriangleDrawer = new SquareTriangleDrawer();
         curveLineDrawer = new CurveLineDrawer();
         lineDrawer = new LineDrawer();
+        ellipseDrawer = new EllipseDrawer();
+        isoscelesTriangleDrawer = new IsoscelesTriangleDrawer();
 
         pencil = new Pencil();
         airbrush = new Airbrush();
@@ -89,6 +94,7 @@ public class Controller {
         calligraphyPen = new CalligraphyPen();
         colorPicker = new ColorPicker();
         floodFiller = new FloodFiller();
+        eraser = new Eraser();
 
         imageInsertion = new ImageInsertion();
 
@@ -96,7 +102,9 @@ public class Controller {
         redoStack = new Stack<>();
 //</editor-fold>
 
-        // set default tool
+        // set default
+        currentColor = Color.BLACK;
+        currentStrokeWidth = 1;
         setTool(ToolType.PENCIL);
 
         mouseActionHandler();
@@ -178,6 +186,12 @@ public class Controller {
                         view.addNodeToPaintPane(node);
                     }
                     break;
+                case ISOSCELES_TRIANGLE:
+                    node = isoscelesTriangleDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
                 case CURVE_LINE:
                     node = curveLineDrawer.mousePressedHandling(event);
                     if (node != null) {
@@ -190,8 +204,20 @@ public class Controller {
                         view.addNodeToPaintPane(node);
                     }
                     break;
+                case ELLIPSE:
+                    node = ellipseDrawer.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
                 case PENCIL:
                     node = pencil.mousePressedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case ERASER:
+                    node = eraser.mousePressedHandling(event);
                     if (node != null) {
                         view.addNodeToPaintPane(node);
                     }
@@ -247,14 +273,26 @@ public class Controller {
                 case SQUARE_TRIANGLE:
                     squareTriangleDrawer.mouseDraggedHandling(event);
                     break;
+                case ISOSCELES_TRIANGLE:
+                    isoscelesTriangleDrawer.mouseDraggedHandling(event);
+                    break;
                 case CURVE_LINE:
                     curveLineDrawer.mouseDraggedHandling(event);
                     break;
                 case LINE:
                     lineDrawer.mouseDraggedHandling(event);
                     break;
+                case ELLIPSE:
+                    ellipseDrawer.mouseDraggedHandling(event);
+                    break;
                 case PENCIL:
                     node = pencil.mouseDraggedHandling(event);
+                    if (node != null) {
+                        view.addNodeToPaintPane(node);
+                    }
+                    break;
+                case ERASER:
+                    node = eraser.mouseDraggedHandling(event);
                     if (node != null) {
                         view.addNodeToPaintPane(node);
                     }
@@ -298,6 +336,9 @@ public class Controller {
                 case SQUARE_TRIANGLE:
                     squareTriangleDrawer.mouseReleasedHandling(event);
                     break;
+                case ISOSCELES_TRIANGLE:
+                    isoscelesTriangleDrawer.mouseReleasedHandling(event);
+                    break;
                 case CURVE_LINE:
                     Node node = curveLineDrawer.mouseReleasedHandling(event);
                     if (node != null) {
@@ -306,6 +347,9 @@ public class Controller {
                     break;
                 case LINE:
                     lineDrawer.mouseReleasedHandling(event);
+                    break;
+                case ELLIPSE:
+                    ellipseDrawer.mouseReleasedHandling(event);
                     break;
                 case AIRBRUSH:
                     airbrush.mouseReleasedHandling(event);
@@ -329,6 +373,8 @@ public class Controller {
                 curveLineDrawer.setBorderVisiable(false);
                 imageInsertion.setBorderVisiable(false);
                 lineDrawer.setBorderVisiable(false);
+                ellipseDrawer.setBorderVisiable(false);
+                isoscelesTriangleDrawer.setBorderVisiable(false);
                 updateUndoRedo();
                 rectangleDrawer.setBorderVisiable(true);
                 roundedRectangleDrawer.setBorderVisiable(true);
@@ -336,6 +382,8 @@ public class Controller {
                 curveLineDrawer.setBorderVisiable(true);
                 imageInsertion.setBorderVisiable(true);
                 lineDrawer.setBorderVisiable(true);
+                ellipseDrawer.setBorderVisiable(true);
+                isoscelesTriangleDrawer.setBorderVisiable(true);
             }
         }
     }
@@ -490,15 +538,7 @@ public class Controller {
         view.addListenerInSlider(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                rectangleDrawer.setStrokeWidth(newValue.doubleValue());
-                roundedRectangleDrawer.setStrokeWidth(newValue.doubleValue());
-                squareTriangleDrawer.setStrokeWidth(newValue.doubleValue());
-                curveLineDrawer.setStrokeWidth(newValue.doubleValue());
-                lineDrawer.setStrokeWidth(newValue.doubleValue());
-                pencil.setStrokeWidth(newValue.doubleValue());
-                airbrush.setStrokeWidth(newValue.doubleValue());
-                brush.setStrokeWidth(newValue.doubleValue());
-                calligraphyPen.setStrokeWidth(newValue.doubleValue());
+                changeStrokeWidth(newValue.doubleValue());
             }
         });
     }
@@ -568,16 +608,38 @@ public class Controller {
 
     //<editor-fold defaultstate="opened" desc="Utility Function">
     private void changeColorOfTools(Color color) {
+        currentColor = color;
+
         rectangleDrawer.setColor(color);
         roundedRectangleDrawer.setColor(color);
         squareTriangleDrawer.setColor(color);
         curveLineDrawer.setColor(color);
         lineDrawer.setColor(color);
+        ellipseDrawer.setColor(color);
+        isoscelesTriangleDrawer.setColor(color);
+
         pencil.setColor(color);
         airbrush.setColor(color);
         brush.setColor(color);
         calligraphyPen.setColor(color);
         floodFiller.setColor(color);
+    }
+
+    private void changeStrokeWidth(double strokeWidth) {
+        currentStrokeWidth = strokeWidth;
+        rectangleDrawer.setStrokeWidth(strokeWidth);
+        roundedRectangleDrawer.setStrokeWidth(strokeWidth);
+        squareTriangleDrawer.setStrokeWidth(strokeWidth);
+        curveLineDrawer.setStrokeWidth(strokeWidth);
+        lineDrawer.setStrokeWidth(strokeWidth);
+        ellipseDrawer.setStrokeWidth(strokeWidth);
+        isoscelesTriangleDrawer.setStrokeWidth(strokeWidth);
+
+        pencil.setStrokeWidth(strokeWidth);
+        airbrush.setStrokeWidth(strokeWidth);
+        brush.setStrokeWidth(strokeWidth);
+        calligraphyPen.setStrokeWidth(strokeWidth);
+        eraser.setStrokeWidth(strokeWidth);
     }
 
     private boolean isWithinPaintPane(double x, double y) {
@@ -606,61 +668,59 @@ public class Controller {
         if (type == currentTool) {
             return;
         }
-        lastTool = currentTool;
+        lastTool = currentTool; // chỗ này trông hơi buồn cười nhưng đúng nhé
+        currentTool = type;
+        if (lastTool == null) { // gán cho lúc đầu mới khởi động phần mềm cả 2 đều là PENCIL
+            lastTool = currentTool;
+        }
         setOffAllTools(type == ToolType.IMAGE_INSERTION);
         switch (type) {
             case RECTANGLE:
-                currentTool = ToolType.RECTANGLE;
                 view.setImageOfCursorInPaintPane(rectangleDrawer.getImageCursor());
                 break;
             case ROUNDED_RECTANGLE:
-                currentTool = ToolType.ROUNDED_RECTANGLE;
                 view.setImageOfCursorInPaintPane(roundedRectangleDrawer.getImageCursor());
                 break;
             case SQUARE_TRIANGLE:
-                currentTool = ToolType.SQUARE_TRIANGLE;
                 view.setImageOfCursorInPaintPane(squareTriangleDrawer.getImageCursor());
                 break;
+            case ISOSCELES_TRIANGLE:
+                view.setImageOfCursorInPaintPane(isoscelesTriangleDrawer.getImageCursor());
+                break;
             case CURVE_LINE:
-                currentTool = ToolType.CURVE_LINE;
                 view.setImageOfCursorInPaintPane(curveLineDrawer.getImageCursor());
                 break;
             case LINE:
-                currentTool = ToolType.LINE;
                 view.setImageOfCursorInPaintPane(lineDrawer.getImageCursor());
                 break;
+            case ELLIPSE:
+                view.setImageOfCursorInPaintPane(ellipseDrawer.getImageCursor());
+                break;
             case PENCIL:
-                currentTool = ToolType.PENCIL;
                 view.setImageOfCursorInPaintPane(pencil.getImageCursor());
                 break;
+            case ERASER:
+                view.setImageOfCursorInPaintPane(eraser.getImageCursor());
+                break;
             case AIRBRUSH:
-                currentTool = ToolType.AIRBRUSH;
                 view.setImageOfCursorInPaintPane(airbrush.getImageCursor());
                 break;
             case BRUSH:
-                currentTool = ToolType.BRUSH;
                 view.setImageOfCursorInPaintPane(brush.getImageCursor());
                 break;
             case CALLIGRAPHY_PEN:
-                currentTool = ToolType.CALLIGRAPHY_PEN;
                 view.setImageOfCursorInPaintPane(calligraphyPen.getImageCursor());
                 break;
             case COLOR_PICKER:
-                currentTool = ToolType.COLOR_PICKER;
                 view.setImageOfCursorInPaintPane(colorPicker.getImageCursor());
                 break;
             case FLOOD_FILLER:
-                currentTool = ToolType.FLOOD_FILLER;
                 view.setImageOfCursorInPaintPane(floodFiller.getImageCursor());
                 break;
             case IMAGE_INSERTION:
-                currentTool = ToolType.IMAGE_INSERTION;
                 break;
             default:
                 break;
-        }
-        if (lastTool == null) {
-            lastTool = currentTool;
         }
     }
 
@@ -703,14 +763,20 @@ public class Controller {
         roundedRectangleDrawer = new RoundedRectangleDrawer();
         squareTriangleDrawer.setActiveState(false);
         squareTriangleDrawer = new SquareTriangleDrawer();
+        isoscelesTriangleDrawer.setActiveState(false);
+        isoscelesTriangleDrawer = new IsoscelesTriangleDrawer();
         curveLineDrawer.setActiveState(false);
         curveLineDrawer = new CurveLineDrawer();
         lineDrawer.setActiveState(false);
         lineDrawer = new LineDrawer();
+        ellipseDrawer.setActiveState(false);
+        ellipseDrawer = new EllipseDrawer();
         if (hasSetToolJustSetImageInsertion == false) {
             imageInsertion.setActiveState(false);
             imageInsertion = new ImageInsertion();
         }
+        changeColorOfTools(currentColor);
+        changeStrokeWidth(currentStrokeWidth);
     }
 
     private void saveImageUtility() {

@@ -1,59 +1,64 @@
-/*
-* To change this license header, choose License Headers in Project Properties.
-* To change this template file, choose Tools | Templates
-* and open the template in the editor.
-*/
-
-/*
 package drawer.Shapes;
 
-import drawer.PaintTool;
-import javafx.geometry.Point2D;
+import drawer.AreaPane;
+import drawer.AreaPane.HoverState;
+import drawer.Tool;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.*;
 
-public class EllipseDrawer extends PaintTool {
-    
+public class EllipseDrawer extends ShapeDrawer implements Tool {
+
     private Ellipse ellipse;
-    
-    public EllipseDrawer(Pane pane) {
-        this.pane = pane;
+
+    public EllipseDrawer() {
+        super();
+        ellipse = new Ellipse(0, 0, 0, 0);
     }
-    
-    public void mousePressedHandling(MouseEvent event) {
-        anchorPoint = new Point2D(event.getX(), event.getY());
-        ellipse = new Ellipse(event.getX(), event.getY(), 0, 0);
-        ellipse.setStroke(color);
-        ellipse.setStrokeWidth(sizeOfPen);
-        ellipse.setFill(Color.TRANSPARENT);
-        pane.getChildren().add(ellipse);
-    }
-    
-    public void mouseDraggedHandling(MouseEvent event) {
-        boolean x = event.getX() < anchorPoint.getX();
-        boolean y = event.getY() < anchorPoint.getY();
-        if (x == false && y == false) {
-            ellipse.setCenterX((event.getX() - anchorPoint.getX()) / 2 + anchorPoint.getX());
-            ellipse.setCenterY((event.getY() - anchorPoint.getY()) / 2 + anchorPoint.getY());
-            ellipse.setRadiusX(ellipse.getCenterX() - anchorPoint.getX());
-            ellipse.setRadiusY(ellipse.getCenterY() - anchorPoint.getY());
-        } else if (x == true && y == false) {
-            ellipse.setCenterX(anchorPoint.getX() - (anchorPoint.getX() - event.getX()) / 2);
-            ellipse.setCenterY((event.getY() - anchorPoint.getY()) / 2 + anchorPoint.getY());
-            ellipse.setRadiusX(anchorPoint.getX() - ellipse.getCenterX());
-            ellipse.setRadiusY(ellipse.getCenterY() - anchorPoint.getY());
-        } else if (x == false && y == true) {
-            ellipse.setCenterX((event.getX() - anchorPoint.getX()) / 2 + anchorPoint.getX());
-            ellipse.setCenterY(anchorPoint.getY() - (anchorPoint.getY() - event.getY()) / 2);
-            ellipse.setRadiusX(ellipse.getCenterX() - anchorPoint.getX());
-            ellipse.setRadiusY(anchorPoint.getY() - ellipse.getCenterY());
+
+    @Override
+    public Node mousePressedHandling(MouseEvent event) {
+        if (areaPane.getHoverState() == HoverState.NULL) {
+            areaPane.setActiveState(false);
+            areaPane = new AreaPane(event.getX(), event.getY());
+
+            ellipse = new Ellipse(event.getX(), event.getY(), 0, 0);
+            ellipse.setFill(Color.TRANSPARENT);
+            ellipse.setStroke(color);
+            ellipse.setStrokeWidth(strokeWidth);
+            ellipse.setStrokeLineCap(strokeLineCap);
+
+            areaPane.getChildren().add(ellipse);
+            areaPane.showBorder();
+            return areaPane;
         } else {
-            ellipse.setCenterX(anchorPoint.getX() - (anchorPoint.getX() - event.getX()) / 2);
-            ellipse.setCenterY(anchorPoint.getY() - (anchorPoint.getY() - event.getY()) / 2);
-            ellipse.setRadiusX(anchorPoint.getX() - ellipse.getCenterX());
-            ellipse.setRadiusY(anchorPoint.getY() - ellipse.getCenterY());
+            areaPane.setMovingState(true);
+            areaPane.setAnchorPoint(event.getX(), event.getY());
         }
+        return null;
     }
-}*/
+
+    @Override
+    public Node mouseDraggedHandling(MouseEvent event) {
+        if (!areaPane.getActiveState()) {
+            areaPane.dragToCreate(event.getX(), event.getY());
+        }
+        if (areaPane.getMovingState()) {
+            areaPane.dragToMoveAndResize(event.getX(), event.getY());
+        }
+        ellipse.setCenterX(areaPane.getPrefWidth() / 2);
+        ellipse.setCenterY(areaPane.getPrefHeight() / 2);
+        ellipse.setRadiusX(areaPane.getPrefWidth() / 2);
+        ellipse.setRadiusY(areaPane.getPrefHeight() / 2);
+        return null;
+    }
+
+    @Override
+    public Node mouseReleasedHandling(MouseEvent event) {
+        areaPane.setActiveState(true);
+        areaPane.setMovingState(false);
+        return null;
+    }
+
+}

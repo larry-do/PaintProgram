@@ -15,6 +15,8 @@ public class LineDrawer extends ShapeDrawer implements Tool {
 
     private Point2D anchorPoint;
 
+    private Point2D p0, p1;
+
     public LineDrawer() {
         super();
         line = new Line();
@@ -74,7 +76,16 @@ public class LineDrawer extends ShapeDrawer implements Tool {
             }
         }
         if (areaPane.getMovingState()) {
+            p0 = new Point2D(areaPane.getLayoutX(), areaPane.getLayoutY());
+            p1 = new Point2D(areaPane.getLayoutX() + areaPane.getPrefWidth(), areaPane.getLayoutY() + areaPane.getPrefHeight());
+
             areaPane.dragToMoveAndResize(event.getX(), event.getY());
+
+            line.setStartX(areaPane.getPrefWidth() / (p1.getX() - p0.getX()) * line.getStartX());
+            line.setStartY(areaPane.getPrefHeight() / (p1.getY() - p0.getY()) * line.getStartY());
+
+            line.setEndX(areaPane.getPrefWidth() / (p1.getX() - p0.getX()) * line.getEndX());
+            line.setEndY(areaPane.getPrefHeight() / (p1.getY() - p0.getY()) * line.getEndY());
         }
         return null;
     }
