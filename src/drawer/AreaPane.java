@@ -313,6 +313,7 @@ public class AreaPane extends Pane {
         activeState = state;
         if (state == false) {
             removeEventFilter(MouseEvent.ANY, hoverEventHandler);
+            setCursorHoveringImage(HoverState.NULL);
             hideBorder();
         } else {
             addEventFilter(MouseEvent.ANY, hoverEventHandler);

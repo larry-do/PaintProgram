@@ -385,21 +385,18 @@ public class Controller {
         view.exitMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (view.isPaintPaneEmpty() == false) {
-                    if (view.showSavingConfirmationMessage()) {
-                        saveImageUtility();
-                    }
+                if (openDialogToConfirmSaving()) {
+                    view.exitAboutWindow();
+                    Platform.exit();
+                    System.exit(0);
                 }
-                view.exitAboutWindow();
-                Platform.exit();
-                System.exit(0);
             }
         });
         // save as
         view.saveAsMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                setOffAllTools();
+                setOffAllTools(false);
                 model.saveAs(view.getImageOfPane());
             }
         });
@@ -427,16 +424,13 @@ public class Controller {
                     imageInsertion = new ImageInsertion();
                     imageInsertion.setImage(image);
 
-                    if (view.isPaintPaneEmpty() == false) {
-                        if (view.showSavingConfirmationMessage()) {
-                            saveImageUtility();
-                        }
+                    if (openDialogToConfirmSaving()) {
+                        view.removeAllNodePaintPane();
+                        view.setSizePaintPane(imageInsertion.getPrefWidth(), imageInsertion.getPrefHeight());
+                        view.addNodeToPaintPane(imageInsertion);
+                        updateUndoRedo();
+                        setTool(ToolType.IMAGE_INSERTION);
                     }
-                    view.removeAllNodePaintPane();
-                    view.setSizePaintPane(imageInsertion.getPrefWidth(), imageInsertion.getPrefHeight());
-                    view.addNodeToPaintPane(imageInsertion);
-                    updateUndoRedo();
-                    setTool(ToolType.IMAGE_INSERTION);
                 }
             }
         });
@@ -451,13 +445,10 @@ public class Controller {
         view.newMenuAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (view.isPaintPaneEmpty() == false) {
-                    if (view.showSavingConfirmationMessage()) {
-                        saveImageUtility();
-                    }
+                if (openDialogToConfirmSaving()) {
+                    view.removeAllNodePaintPane();
+                    model.resetModel();
                 }
-                view.removeAllNodePaintPane();
-                model.resetModel();
             }
         });
         // save
@@ -596,99 +587,50 @@ public class Controller {
             return;
         }
         lastTool = currentTool;
+        setOffAllTools(type == ToolType.IMAGE_INSERTION);
         switch (type) {
             case RECTANGLE:
                 currentTool = ToolType.RECTANGLE;
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                 break;
             case ROUNDED_RECTANGLE:
                 currentTool = ToolType.ROUNDED_RECTANGLE;
-                rectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                 break;
             case SQUARE_TRIANGLE:
                 currentTool = ToolType.SQUARE_TRIANGLE;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                 break;
             case CURVE_LINE:
                 currentTool = ToolType.CURVE_LINE;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/shape-cursor.png"), 100, 100);
                 break;
             case PENCIL:
                 currentTool = ToolType.PENCIL;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/pencil-cursor.png"), 0, 200);
                 break;
             case AIRBRUSH:
                 currentTool = ToolType.AIRBRUSH;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/airbrush-cursor.png"), 180, 30);
                 break;
             case BRUSH:
                 currentTool = ToolType.BRUSH;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/brush-cursor.png"), 30, 30);
                 break;
             case CALLIGRAPHY_PEN:
                 currentTool = ToolType.CALLIGRAPHY_PEN;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/calligraphyPen-cursor.png"), 0, 200);
                 break;
             case COLOR_PICKER:
                 currentTool = ToolType.COLOR_PICKER;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/colorPicker-cursor.png"), 0, 200);
                 break;
             case FLOOD_FILLER:
                 currentTool = ToolType.FLOOD_FILLER;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
-                imageInsertion.setActiveState(false);
                 view.setImageOfCursorInPaintPane(new Image("icon/floodFiller-cursor.png"), 200, 200);
                 break;
             case IMAGE_INSERTION:
                 currentTool = ToolType.IMAGE_INSERTION;
-                rectangleDrawer.setActiveState(false);
-                roundedRectangleDrawer.setActiveState(false);
-                squareTriangleDrawer.setActiveState(false);
-                curveLineDrawer.setActiveState(false);
                 break;
             default:
                 break;
@@ -723,23 +665,53 @@ public class Controller {
             undoStack.add(redoStack.pop());
         }
     }
+
+    private void resetUndoRedo() {
+        undoStack.removeAllElements();
+        redoStack.removeAllElements();
+    }
     //</editor-fold>
 
-    private void setOffAllTools() {
+    private void setOffAllTools(boolean hasSetToolJustSetImageInsertion) { // nói chung hàm này tắt hết các công cụ. chú ý là không được tắt khi vừa chọn Tool Image Insertion
         rectangleDrawer.setActiveState(false);
+        rectangleDrawer = new RectangleDrawer();
         roundedRectangleDrawer.setActiveState(false);
+        roundedRectangleDrawer = new RoundedRectangleDrawer();
         squareTriangleDrawer.setActiveState(false);
+        squareTriangleDrawer = new SquareTriangleDrawer();
         curveLineDrawer.setActiveState(false);
-        imageInsertion.setActiveState(false);
+        curveLineDrawer = new CurveLineDrawer();
+        if (hasSetToolJustSetImageInsertion == false) {
+            imageInsertion.setActiveState(false);
+            imageInsertion = new ImageInsertion();
+        }
     }
 
-    public void saveImageUtility() {
-        setOffAllTools();
+    private void saveImageUtility() {
+        setOffAllTools(false);
         if (model.isFileEmpty()) {
             model.saveAs(view.getImageOfPane());
         } else {
             model.writeImageToFile(view.getImageOfPane());
         }
+    }
+
+    public boolean openDialogToConfirmSaving() { // trả về false nếu nhấn vào nút x exit
+        if (view.isPaintPaneEmpty() == false) {
+            view.showSavingConfirmationMessage();
+            if (view.doUserPressYesInSavingConfirmationMessage()) {
+                saveImageUtility();
+                resetUndoRedo();
+                return true;
+            }
+            if (view.doUserPressNoInSavingConfirmationMessage()) {
+                resetUndoRedo();
+                return true;
+            }
+        } else {
+            return true;
+        }
+        return false;
     }
     //</editor-fold>
 }

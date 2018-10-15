@@ -35,7 +35,7 @@ public class View {
     private ToolBarView toolBarView;
 
     private SavingConfirmationDialog savingConfirmationDialog;
-    
+
     private final AboutWindow aboutWindow;
 
     public View() {
@@ -75,7 +75,7 @@ public class View {
         //</editor-fold>
 
         savingConfirmationDialog = new SavingConfirmationDialog();
-        
+
         aboutWindow = new AboutWindow();
 
         showCurrentImageSizeOnScreen((int) paintScrollPane.getPaintPaneWidth(), (int) paintScrollPane.getPaintPaneHeight());
@@ -112,8 +112,8 @@ public class View {
     public void saveMenuAction(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInSaveMenuItem(eventHandler);
     }
-    
-    public void aboutMenuAcion(EventHandler<ActionEvent> eventHandler){
+
+    public void aboutMenuAcion(EventHandler<ActionEvent> eventHandler) {
         menuBarView.addEventHandlerInAboutMenuItem(eventHandler);
     }
 
@@ -192,8 +192,16 @@ public class View {
         return scene;
     }
 
-    public boolean showSavingConfirmationMessage() {
-        return savingConfirmationDialog.showToUser();
+    public void showSavingConfirmationMessage() {
+        savingConfirmationDialog.showToUser();
+    }
+
+    public boolean doUserPressYesInSavingConfirmationMessage() {
+        return savingConfirmationDialog.doUserPressYes();
+    }
+
+    public boolean doUserPressNoInSavingConfirmationMessage() {
+        return savingConfirmationDialog.doUserPressNo();
     }
 
     public void showCurrentPositionOfMouseOnScreen(int x, int y) {
@@ -203,12 +211,12 @@ public class View {
     public void showCurrentImageSizeOnScreen(int x, int y) {
         toolBarView.showCurrentImageSizeOnScreen(x, y);
     }
-    
-    public void displayAboutWindow(){
+
+    public void displayAboutWindow() {
         aboutWindow.show();
     }
-    
-    public void exitAboutWindow(){
+
+    public void exitAboutWindow() {
         aboutWindow.close();
     }
 }

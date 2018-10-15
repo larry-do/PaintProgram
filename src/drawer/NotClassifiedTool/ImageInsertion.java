@@ -35,7 +35,7 @@ public class ImageInsertion extends AreaPane implements Tool {
     }
 
     @Override
-    public Node mousePressedHandling(MouseEvent event) {
+    public Node mousePressedHandling(MouseEvent event) { // khi vừa press mà active state đã false có nghĩa là press vào vùng ngoài vật thể
         if (this.getHoverState() == HoverState.NULL) {
             this.setMovingState(false);
             this.setActiveState(false);

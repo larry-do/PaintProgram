@@ -46,8 +46,11 @@ public class FXMain extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>(){
             @Override
             public void handle(WindowEvent event) {
-                controller.saveImageUtility();
-                primaryStage.close();
+                if (controller.openDialogToConfirmSaving()) {
+                    primaryStage.close();
+                } else {
+                    event.consume();
+                }
             }
         });
     }
