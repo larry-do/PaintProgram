@@ -31,6 +31,7 @@ public class EllipseDrawer extends ShapeDrawer implements Tool {
 
             areaPane.getChildren().add(ellipse);
             areaPane.showBorder();
+            areaPane.setBorderVisiable(false);
             return areaPane;
         } else {
             areaPane.setMovingState(true);
@@ -58,6 +59,7 @@ public class EllipseDrawer extends ShapeDrawer implements Tool {
     public Node mouseReleasedHandling(MouseEvent event) {
         areaPane.setActiveState(true);
         areaPane.setMovingState(false);
+        areaPane.setBorderVisiable(true);
         return null;
     }
 

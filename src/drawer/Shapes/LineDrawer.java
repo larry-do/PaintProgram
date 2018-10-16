@@ -36,6 +36,8 @@ public class LineDrawer extends ShapeDrawer implements Tool {
 
             areaPane.getChildren().add(line);
             areaPane.showBorder();
+            areaPane.setBorderVisiable(false);
+            
 
             anchorPoint = new Point2D(event.getX(), event.getY());
             return areaPane;
@@ -94,6 +96,7 @@ public class LineDrawer extends ShapeDrawer implements Tool {
     public Node mouseReleasedHandling(MouseEvent event) {
         areaPane.setActiveState(true);
         areaPane.setMovingState(false);
+        areaPane.setBorderVisiable(true);
         return null;
     }
 

@@ -5,7 +5,8 @@ import drawer.Pens.*;
 import drawer.Shapes.*;
 import drawer.Tool.ToolType;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.Deque;
+import java.util.LinkedList;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -61,7 +62,7 @@ public class Controller {
     private Color currentColor;
     private double currentStrokeWidth;
 
-    private Stack<WritableImage> undoStack, redoStack;
+    private Deque<WritableImage> undoStack, redoStack;
     //</editor-fold>
 
     public Controller(View v, Model m) {
@@ -98,8 +99,8 @@ public class Controller {
 
         imageInsertion = new ImageInsertion();
 
-        undoStack = new Stack<>();
-        redoStack = new Stack<>();
+        undoStack = new LinkedList<>();
+        redoStack = new LinkedList<>();
 //</editor-fold>
 
         // set default
@@ -726,19 +727,23 @@ public class Controller {
 
     //<editor-fold defaultstate="opened" desc="Undo Redo Utility">
     private void updateUndoRedo() {
-        undoStack.add(view.getImageOfPane());
-        redoStack.removeAllElements();
+        undoStack.addFirst(view.getImageOfPane());
+        while (undoStack.size() > 30) { // giới hạn số lần undo thôi. nhiều quá ko lưu được hết, nặng, lag
+            undoStack.removeLast();
+        }
+        redoStack.clear();
     }
 
     private void getUndo() {
         if (!undoStack.isEmpty()) {
-            redoStack.add(undoStack.pop());
+            redoStack.addFirst(undoStack.pop());
         }
         view.removeAllNodePaintPane();
         if (!undoStack.isEmpty()) {
             view.setSizePaintPane(undoStack.peek().getWidth(), undoStack.peek().getHeight());
             view.addNodeToPaintPane(new ImageView(undoStack.peek()));
         }
+        setOffAllTools(false);
     }
 
     private void getRedo() {
@@ -746,13 +751,14 @@ public class Controller {
             view.removeAllNodePaintPane();
             view.setSizePaintPane(redoStack.peek().getWidth(), redoStack.peek().getHeight());
             view.addNodeToPaintPane(new ImageView(redoStack.peek()));
-            undoStack.add(redoStack.pop());
+            undoStack.addFirst(redoStack.pop());
         }
+        setOffAllTools(false);
     }
 
     private void resetUndoRedo() {
-        undoStack.removeAllElements();
-        redoStack.removeAllElements();
+        undoStack.clear();
+        redoStack.clear();
     }
     //</editor-fold>
 

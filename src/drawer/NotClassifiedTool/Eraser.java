@@ -18,7 +18,7 @@ public class Eraser extends PenTool implements Tool {
     public Eraser() {
         super();
         line = new Line(0, 0, 0, 0);
-        strokeLineCap = StrokeLineCap.SQUARE;
+        strokeLineCap = StrokeLineCap.ROUND;
         color = Color.WHITE;
 
         imageCursor = new ImageCursor(new Image("icon/shape-cursor.png"), 100, 100);

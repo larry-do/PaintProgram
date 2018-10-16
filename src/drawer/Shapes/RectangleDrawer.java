@@ -31,6 +31,7 @@ public class RectangleDrawer extends ShapeDrawer implements Tool {
 
             areaPane.getChildren().add(rectangle); // add rectangle firstly
             areaPane.showBorder();
+            areaPane.setBorderVisiable(false);
             return areaPane;
         } else {
             areaPane.setMovingState(true);
@@ -56,6 +57,7 @@ public class RectangleDrawer extends ShapeDrawer implements Tool {
     public Node mouseReleasedHandling(MouseEvent event) {
         areaPane.setActiveState(true);
         areaPane.setMovingState(false);
+        areaPane.setBorderVisiable(true);
         return null;
     }
 
